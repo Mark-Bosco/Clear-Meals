@@ -1,8 +1,8 @@
 import OAuth from 'oauth-1.0a';
 import CryptoJS from 'crypto-js';
 
-const consumerKey = 'd9427d9c52974c65bdd583782e29787c';
-const consumerSecret = '89ef8f64d2894a45a0fdae5262b62e3a';
+const consumerKey = '';
+const consumerSecret = '';
 
 const oauth = new OAuth({
   consumer: { key: consumerKey, secret: consumerSecret },
