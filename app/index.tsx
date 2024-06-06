@@ -1,6 +1,7 @@
+import { Link } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Touchable, TouchableOpacity, Platform } from 'react-native';
-import { Provider as PaperProvider, Card, Button, IconButton } from 'react-native-paper';
+import { View, Text, ScrollView, StyleSheet, Pressable, Platform } from 'react-native';
+import { Provider as PaperProvider, IconButton } from 'react-native-paper';
 
 type FoodItem = {
   name: string;
@@ -29,6 +30,7 @@ const meals: MealSection[] = [
 const totalCalories = meals.reduce((sum, meal) => sum + meal.totalCalories, 0);
 
 const App = () => {
+
   const [visibleMenus, setVisibleMenus] = useState<VisibleMenus>({
     nutMenu: false,
     mealMenu: false
@@ -109,9 +111,11 @@ const App = () => {
         {/* Meal Menu */}
         {visibleMenus.mealMenu && (
           <View className="flex col bg-green-700 p-2">
-            <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl" onPress={() => toggleMenu('mealMenu')}>
-              <Text className="text-4xl text-black font-bold">Breakfast</Text>
-            </Pressable>
+            <Link href="/search" asChild>
+              <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
+                <Text className="text-4xl text-black font-bold">Breakfast</Text>
+              </Pressable>
+            </Link>
             <Pressable className="items-center bg-gray-100 p-2 mt-4 mx-2 rounded-xl" onPress={() => toggleMenu('mealMenu')}>
               <Text className="text-4xl text-black font-bold">Lunch</Text>
             </Pressable>

@@ -7,6 +7,9 @@ export default function RootLayout() {
     <PaperProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="search" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="history" options={{ headerShown: false }} /> */}
+        {/* <Stack.Screen name="settings" options={{ headerShown: false }} /> */}
       </Stack>
     </PaperProvider>
   );
