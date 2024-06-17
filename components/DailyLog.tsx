@@ -1,4 +1,4 @@
-// src/components/DailyLog.tsx
+
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import Meal, { MealType } from './Meal';

@@ -1,4 +1,4 @@
-// src/components/Meal.tsx
+
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import FoodItem, { FoodItemType } from './FoodItem';
