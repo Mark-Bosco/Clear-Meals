@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const querystring = require('querystring');
-const { clientSecret, clientId, ip } = require('./config');
 const NodeCache = require('node-cache');
 
 // Create a new cache object
@@ -47,8 +46,8 @@ proxy.post('/token', async (req, res) => {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       auth: {
-        username: clientId,
-        password: clientSecret
+        username: Constants.expoConfig?.extra?.clientId,
+        password: Constants.expoConfig?.extra?.clientSecret
       },
       data: querystring.stringify({
         grant_type: 'client_credentials',

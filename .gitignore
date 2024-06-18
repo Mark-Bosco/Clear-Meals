@@ -8,6 +8,8 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+firebase.env
+api.env
 web-build/
 backend/config.js
 

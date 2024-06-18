@@ -1,5 +1,7 @@
 import axios from 'axios';
-const { ip } = require('./config');
+import Constants from 'expo-constants';
+
+const proxyIp = Constants.expoConfig?.extra?.proxyIp;
 
 // Get access token from the backend
 const getAccessToken = async () => {
@@ -7,8 +9,8 @@ const getAccessToken = async () => {
 
     // Make a POST request to the backend to get the access token
     try {
-        console.log(`${ip}`)
-        const response = await axios.get(`http://192.168.56.1:3000/token`);
+        console.log(proxyIp)
+        const response = await axios.get(`http://${proxyIp}:3000/token`);
         console.log('Received response from the backend:', response.data);
         return response.data.access_token;
     } catch (error: any) {
@@ -16,7 +18,7 @@ const getAccessToken = async () => {
         if (error.response && error.response.status === 404) {
             console.log('Access token not found in cache, requesting a new one');
             try {
-                const response = await axios.post(`http://${ip}:3000/token`);
+                const response = await axios.post(`http://${proxyIp}:3000/token`);
                 console.log('Received response from the backend:', response.data);
                 return response.data.access_token;
             } catch (err) {
