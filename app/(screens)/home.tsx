@@ -29,7 +29,7 @@ const meals: MealSection[] = [
 
 const totalCalories = meals.reduce((sum, meal) => sum + meal.totalCalories, 0);
 
-const App = () => {
+const Home = () => {
 
   const [visibleMenus, setVisibleMenus] = useState<VisibleMenus>({
     nutMenu: false,
@@ -140,7 +140,7 @@ const App = () => {
   );
 };
 
-export default App;
+export default Home;
 
 const styles = StyleSheet.create({
   nutMenuContainer: {

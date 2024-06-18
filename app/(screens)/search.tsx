@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, ScrollView } from "react-native";
-import { searchFood } from "../backend/api";
+import { searchFood } from "../../backend/api";
 
 // The Search component fetches the access token and searches for food
 const Search = () => {
