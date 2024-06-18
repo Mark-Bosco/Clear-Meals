@@ -3,12 +3,33 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const querystring = require('querystring');
 const { clientSecret, clientId, ip } = require('./config');
+const NodeCache = require('node-cache');
+
+// Create a new cache object
+const cache = new NodeCache();
 
 // Create a new Express app
 const proxy = express();
 
 // Use the body-parser middleware
 proxy.use(bodyParser.json());
+
+// Create a GET route to retrieve the access token from the cache
+proxy.get('/token', (req, res) => {
+  console.log('Received GET request for /accessToken endpoint');
+
+  // Get the access token from the cache
+  const accessToken = cache.get('access_token');
+
+  // Check if the access token exists
+  if (accessToken) {
+    console.log('Access token found in cache:', accessToken);
+    res.json({ access_token: accessToken.access_token });
+  } else {
+    console.log('Access token not found in cache');
+    res.status(404).json({ error: 'Access token not found' });
+  }
+});
 
 // Create a POST route to the /token endpoint
 proxy.post('/token', async (req, res) => {
@@ -35,10 +56,18 @@ proxy.post('/token', async (req, res) => {
       })
     });
 
+    const accessToken = {
+      access_token: response.data.access_token,
+      expires_in: response.data.expires_in,
+    };
+
+    const expirationTime = new Date().getTime() + (accessToken.expires_in * 1000);
+    cache.set('access_token', accessToken, expirationTime);
+
     console.log('Received response from FatSecret API:', response.data);
 
     // Return the response from the FatSecret API
-    res.json(response.data);
+    res.json(response);
   } catch (error) {
     console.error('Error occurred while requesting access token:', error);
     res.status(500).json({ error: error.message });

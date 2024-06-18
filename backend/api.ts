@@ -1,5 +1,5 @@
 import axios from 'axios';
-import ip from './config';
+const { ip } = require('./config');
 
 // Get access token from the backend
 const getAccessToken = async () => {
@@ -7,20 +7,37 @@ const getAccessToken = async () => {
 
     // Make a POST request to the backend to get the access token
     try {
-        const response = await axios.post(`http://${ip}:3000/token`);
+        console.log(`${ip}`)
+        const response = await axios.get(`http://192.168.56.1:3000/token`);
         console.log('Received response from the backend:', response.data);
-
-        // The response.data object contains the access token
         return response.data.access_token;
-    // Catch any errors that occur during the request
-    } catch (error) {
-        console.error('Error getting access token', error);
-        throw error;
+    } catch (error: any) {
+        // If the access token is not found in the cache or there's an error, request a new one
+        if (error.response && error.response.status === 404) {
+            console.log('Access token not found in cache, requesting a new one');
+            try {
+                const response = await axios.post(`http://${ip}:3000/token`);
+                console.log('Received response from the backend:', response.data);
+                return response.data.access_token;
+            } catch (err) {
+                console.error('Error getting new access token', err);
+                throw err;
+            }
+        } else if (error.response) {
+            console.error(`Error getting access token (${error.response.status}):`, error.response.data);
+            throw error;
+        } else {
+            console.error('Error getting access token', error);
+            throw error;
+        }
     }
 };
 
 // Search for food using the access token
-const searchFood = async (accessToken: string, query: string) => {
+const searchFood = async (query: string) => {
+
+    const accessToken = await getAccessToken();
+
     console.log('Searching for food:', query);
 
     // Make a POST request to the backend to search for food
@@ -54,4 +71,4 @@ const searchFood = async (accessToken: string, query: string) => {
 };
 
 // Export the functions to use them in other files
-export { getAccessToken, searchFood };
+export { searchFood };
