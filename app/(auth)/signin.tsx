@@ -1,21 +1,21 @@
-import { StatusBar } from 'expo-status-bar';
+import { Link } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function SignIn() {
   return (
-    <View style={styles.container}>
-      <Text>Sign In!</Text>
-      <StatusBar style="auto" />
+    <View className='p-20'>
+      <Text>Welcome!</Text>
+      <Link href="/home" asChild>
+        <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
+          <Text className="text-4xl text-black font-bold">Sign In</Text>
+        </Pressable>
+      </Link>
+      <Link href="/signup" asChild>
+        <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
+          <Text className="text-4xl text-black font-bold">Sign Up</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
