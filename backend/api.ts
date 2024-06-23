@@ -13,7 +13,7 @@ const getAccessToken = async () => {
         const response = await axios.get(`http://${proxyIp}:3000/token`);
         console.log('Received response from the backend:', response.data);
         return response.data.access_token;
-    } catch (error: any) {
+    } catch (error : any) {
         // If the access token is not found in the cache or there's an error, request a new one
         if (error.response && error.response.status === 404) {
             console.log('Access token not found in cache, requesting a new one');

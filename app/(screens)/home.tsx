@@ -1,4 +1,7 @@
-import { Link } from 'expo-router';
+import { auth } from '../../firebase';
+import { signOut } from 'firebase/auth';
+import { useAuthentication } from '@/hooks/useAuthentication';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Platform } from 'react-native';
 import { Provider as PaperProvider, IconButton } from 'react-native-paper';
@@ -30,6 +33,8 @@ const meals: MealSection[] = [
 const totalCalories = meals.reduce((sum, meal) => sum + meal.totalCalories, 0);
 
 const Home = () => {
+  const router = useRouter();
+  const { user } = useAuthentication();
 
   const [visibleMenus, setVisibleMenus] = useState<VisibleMenus>({
     nutMenu: false,
@@ -43,14 +48,22 @@ const Home = () => {
     }));
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.replace('/(auth)/signin'); // Navigate to the welcome screen after sign out
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
-    <PaperProvider>
-      {/* Header */}
       <View className="flex-1 bg-white pt-10">
         <View className="px-4 py-2 flex-row justify-between items-center">
           <IconButton icon="clock-outline" size={36} onPress={() => { }} />
           <Text className="text-3xl text-gray-500 font-semibold" onPress={() => { }} >June, 1st</Text>
-          <IconButton icon="cog-outline" size={36} onPress={() => { }} />
+          <Text className="text-3xl text-gray-500 font-semibold">Welcome {user?.email}!</Text>
+          <IconButton icon="cog-outline" size={36} onPress={handleSignOut} />
         </View>
 
         {/* Total Calories */}
@@ -136,7 +149,6 @@ const Home = () => {
         )}
 
       </View>
-    </PaperProvider>
   );
 };
 
