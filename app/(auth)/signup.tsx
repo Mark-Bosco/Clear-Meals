@@ -13,26 +13,38 @@ export default function SignUp() {
     error: ''
   });
 
-  async function signUp() {
-    if (value.email === '' || value.password === '') {
-      setValue({ ...value, error: 'Email and password required' });
-      return;
-    }
-
-    try {
-      await createUserWithEmailAndPassword(auth, value.email, value.password);
-      // Navigate to the home screen using expo router
-      router.replace('/home');
-    } catch (error : any) {
-      setValue({ ...value, error: error.message });
-    }
-
+  const resetError = () => {
     setValue({ ...value, error: '' });
+  };
+
+  async function signUp() {
+    // Use a callback to get the most recent state
+    setValue(currentValue => {
+
+      if (currentValue.email === '' || currentValue.password === '') {
+        return { ...currentValue, error: 'Email and password required' };
+      }
+
+      if (currentValue.password.length < 6) {
+        return { ...currentValue, error: 'Password must be at least 6 characters' };
+      }
+
+      // Proceed with sign up
+      createUserWithEmailAndPassword(auth, currentValue.email, currentValue.password)
+        .then(() => {
+          router.replace('/signin');
+        })
+        .catch((error: any) => {
+          return { ...currentValue, error: error.message };
+        });
+
+      return currentValue;
+    });
   }
 
   return (
-    <View className="flex-1 pt-5 bg-white items-center justify-center p-4">
-      <Text className="text-xl font-bold mb-4">Signup screen!</Text>
+    <View className="flex-1 pt-20 bg-white items-center justify-top p-4">
+      <Text className="text-6xl font-bold mb-4">Sign Up</Text>
 
       {!!value.error && (
         <View className="mt-2 p-2 bg-red-500 rounded">
@@ -63,7 +75,7 @@ export default function SignUp() {
         </View>
 
         <Pressable
-          className="bg-blue-500 py-2 px-4 rounded active:bg-blue-600"
+          className="bg-green-700 py-2 px-4 rounded active:bg-green-800"
           onPress={signUp}
         >
           {({ pressed }) => (
@@ -74,10 +86,12 @@ export default function SignUp() {
         </Pressable>
 
         <Link href="/signin" asChild>
-          <Pressable className="mt-4">
+          <Pressable
+            className="mt-4"
+            onPress={resetError}>
             {({ pressed }) => (
-              <Text className={`text-center text-blue-500 ${pressed ? 'opacity-75' : ''}`}>
-                Already have an account? Sign in
+              <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
+                Sign in
               </Text>
             )}
           </Pressable>

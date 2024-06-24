@@ -1,5 +1,5 @@
 import { auth } from '../../firebase';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -13,26 +13,49 @@ export default function SignIn() {
     error: ''
   });
 
-  async function signIn() {
-    if (value.email === '' || value.password === '') {
-      setValue({ ...value, error: 'Email and password required' });
-      return;
-    }
-
-    try {
-      await signInWithEmailAndPassword(auth, value.email, value.password);
-      // Navigate to the home screen using expo router
-      router.replace('/(screens)/home');
-    } catch (error : any) {
-      setValue({ ...value, error: error.message });
-    }
-
+  const resetError = () => {
     setValue({ ...value, error: '' });
+  };
+
+  async function signIn() {
+    // Use a callback to get the most recent state
+    setValue(currentValue => {
+
+      // Proceed with sign in
+      signInWithEmailAndPassword(auth, currentValue.email, currentValue.password)
+        .then(() => {
+          router.replace('/(screens)/home');
+          return currentValue;
+        })
+        .catch((error: any) => {
+          return { ...currentValue, error: error.message };
+        });
+
+      return { ...currentValue, error: 'Email or password invald' };
+    });
+  }
+
+  async function resetPassword() {
+    setValue(currentValue => {
+      if (currentValue.email === '') {
+        return { ...currentValue, error: 'Please enter your email to reset password' };
+      }
+
+      sendPasswordResetEmail(auth, currentValue.email)
+        .then(() => {
+          setValue({ ...currentValue, error: 'Password reset email sent!' });
+        })
+        .catch((error) => {
+          setValue({ ...currentValue, error: error.message });
+        });
+
+      return currentValue;
+    });
   }
 
   return (
-    <View className="flex-1 pt-5 bg-white items-center justify-center p-4">
-      <Text className="text-xl font-bold mb-4">Signin screen!</Text>
+    <View className="flex-1 pt-20 bg-white items-center justify-top p-4">
+      <Text className="text-6xl font-bold mb-4">Sign In</Text>
 
       {!!value.error && (
         <View className="mt-2 p-2 bg-red-500 rounded">
@@ -63,7 +86,7 @@ export default function SignIn() {
         </View>
 
         <Pressable
-          className="bg-blue-500 py-2 px-4 rounded active:bg-blue-600"
+          className="bg-green-700 py-2 px-4 rounded active:bg-green-800"
           onPress={signIn}
         >
           {({ pressed }) => (
@@ -73,11 +96,24 @@ export default function SignIn() {
           )}
         </Pressable>
 
+        <Pressable
+          className="mt-4"
+          onPress={resetPassword}
+        >
+          {({ pressed }) => (
+            <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
+              Reset your password
+            </Text>
+          )}
+        </Pressable>
+
         <Link href="/signup" asChild>
-          <Pressable className="mt-4">
+          <Pressable
+            className="mt-4"
+            onPress={resetError}>
             {({ pressed }) => (
-              <Text className={`text-center text-blue-500 ${pressed ? 'opacity-75' : ''}`}>
-                Don't have an account? Sign up!
+              <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
+                Sign up
               </Text>
             )}
           </Pressable>
