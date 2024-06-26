@@ -1,10 +1,10 @@
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
-import { useAuthentication } from '@/hooks/useAuthentication';
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Platform } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useAuth } from '../(auth)/AuthContext';
 
 type FoodItem = {
   name: string;
@@ -33,8 +33,8 @@ const meals: MealSection[] = [
 const totalCalories = meals.reduce((sum, meal) => sum + meal.totalCalories, 0);
 
 const Home = () => {
+  const { user } = useAuth();
   const router = useRouter();
-  const { user } = useAuthentication();
 
   const [visibleMenus, setVisibleMenus] = useState<VisibleMenus>({
     nutMenu: false,
@@ -51,7 +51,7 @@ const Home = () => {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.replace('/(auth)/signin'); // Navigate to the welcome screen after sign out
+      router.replace('/(auth)/signin');
     } catch (error) {
       console.error('Error signing out:', error);
     }

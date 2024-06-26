@@ -1,13 +1,15 @@
-import firebase from "../firebase";
+import { AuthProvider } from "./(auth)/AuthContext"; // Adjust the import path as needed
 import { Stack } from "expo-router";
 import "../global.css";
 
 export default function RootLayout() {
     return (
-        <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(screens)" options={{ headerShown: false }} />
-        </Stack>
+        <AuthProvider>
+            <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+            </Stack>
+        </AuthProvider>
     );
 }

@@ -3,6 +3,9 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const querystring = require('querystring');
 const NodeCache = require('node-cache');
+require('dotenv').config();
+const appConfig = require('../app.config.js');
+const proxyIp = appConfig.expo.extra.proxyIp;
 
 // Create a new cache object
 const cache = new NodeCache();
@@ -46,8 +49,8 @@ proxy.post('/token', async (req, res) => {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       auth: {
-        username: Constants.expoConfig?.extra?.clientId,
-        password: Constants.expoConfig?.extra?.clientSecret
+        username: appConfig.expo.extra.clientId,
+        password: appConfig.expo.extra.clientSecret
       },
       data: querystring.stringify({
         grant_type: 'client_credentials',
@@ -74,6 +77,6 @@ proxy.post('/token', async (req, res) => {
 });
 
 // Listen on the specified IP address and port
-proxy.listen(3000, ip, () => {
+proxy.listen(3000, proxyIp, () => {
   console.log("Proxy server running");
 });

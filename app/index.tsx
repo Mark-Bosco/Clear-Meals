@@ -1,19 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useAuth } from './(auth)/AuthContext';
+import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import { View, Text } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    setIsMounted(true); // Set isMounted to true after component mounts
-  }, []);
-
-  useEffect(() => {
-    if (isMounted) {
-      router.replace('/(auth)/signin'); // Navigate to the sign-in screen if the user is not authenticated
+    if (!isLoading) {
+      if (user) {
+        router.replace('/(screens)/home'); // Navigate to home screen if user is authenticated
+      } else {
+        router.replace('/(auth)/signin'); // Navigate to sign-in screen if user is not authenticated
+      }
     }
-  }, [isMounted, router]); // Add router to dependency array to avoid potential issues
+  }, [isLoading, user, router]);
 
-  return null; // or a loading screen, if necessary
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  return null;
 }
