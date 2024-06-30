@@ -15,8 +15,9 @@
 
 ## Next Dev Steps:
 
-- Add firebase user authentication
+- Fix config so that backend gets valid credentials 
 - Integrate user accounts with fatsecret API so that each user gets their own access token
+- Store user access tokens using async
 - Create the search screen
 - Create a function in SearchScreen to add a selected food to a meal (you'll need to manage meal state, possibly in a context or Redux).
 - Use DailyLog in your main app component or a dedicated screen to display the user's daily food intake.
