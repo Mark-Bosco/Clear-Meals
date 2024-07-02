@@ -50,7 +50,7 @@ module.exports = {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       proxyIp: process.env.PROXY_IP,
       clientSecret: process.env.CLIENT_SECRET,
-      clientId: process.env.CLIENT_ID
+      clientId: process.env.CLIENT_ID,
     }
   }
 };

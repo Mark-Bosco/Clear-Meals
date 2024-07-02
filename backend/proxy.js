@@ -8,6 +8,13 @@ const appConfig = require('../app.config');
 const clientId = appConfig.expo.extra.clientId;
 const clientSecret = appConfig.expo.extra.clientSecret;
 const proxyIp = appConfig.expo.extra.proxyIp;
+const admin = require('firebase-admin');
+const serviceAccount = require('../serviceAccountKey.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  // You can add other configuration options here if needed
+});
 
 // Create a new cache object
 const cache = new NodeCache();
@@ -18,51 +25,89 @@ const proxy = express();
 // Use the body-parser middleware
 proxy.use(bodyParser.json());
 
-// Create a GET route to retrieve the access token from the cache
-proxy.get('/token', (req, res) => {
-  console.log('Received GET request for /token endpoint');
-  // Get the access token from the cache
-  const accessToken = cache.get('access_token');
-  // Check if the access token exists
-  if (accessToken) {
-    console.log('Access token found in cache:', accessToken);
+// Endpoint for user-specific tokens
+proxy.post('/user-token', async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    // Verify the Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+
+    // Check if a user token exists for this user
+    let accessToken = cache.get(`user_token_${uid}`);
+
+    if (!accessToken) {
+      // If no token exists, request a new one from FatSecret
+      const response = await axios({
+        method: 'post',
+        url: 'https://oauth.fatsecret.com/connect/token',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        auth: {
+          username: clientId,
+          password: clientSecret
+        },
+        data: querystring.stringify({
+          grant_type: 'client_credentials',
+          scope: 'basic'
+        })
+      });
+
+      accessToken = response.data.access_token;
+      // Store the token in cache with the user's UID
+      cache.set(`user_token_${uid}`, accessToken);
+    }
+    else {
+      console.log('User token found in cache');
+    }
+
     res.json({ access_token: accessToken });
-  } else {
-    console.log('Access token not found in cache');
-    res.status(404).json({ error: 'Access token not found' });
+  } catch (error) {
+    console.error('Error occurred while requesting user-specific token:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Create a POST route to the /token endpoint
-proxy.post('/token', async (req, res) => {
-  console.log('Received POST request for /token endpoint');
-  // Make a POST request to the FatSecret API to get an access token
+// Endpoint for general tokens
+proxy.post('/general-token', async (req, res) => {
+  console.log('Received POST request for /general-token endpoint');
+
   try {
-    console.log('Sending request to FatSecret API for access token');
-    // Send a POST request to the /connect/token endpoint
-    const response = await axios({
-      method: 'post',
-      url: 'https://oauth.fatsecret.com/connect/token',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      auth: {
-        username: clientId,
-        password: clientSecret
-      },
-      data: querystring.stringify({
-        grant_type: 'client_credentials',
-        scope: 'basic'
-      })
-    });
-    
-    const accessToken = response.data.access_token;
-    cache.set('access_token', accessToken);
-    console.log('Received response from FatSecret API:', response.data);
-    // Return the access token
+    // Check if a general token exists in the cache
+    let accessToken = cache.get('general_access_token');
+
+    if (!accessToken) {
+      console.log('General token not found in cache, requesting a new one');
+      // If no token exists, request a new one from FatSecret
+      const response = await axios({
+        method: 'post',
+        url: 'https://oauth.fatsecret.com/connect/token',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        auth: {
+          username: clientId,
+          password: clientSecret
+        },
+        data: querystring.stringify({
+          grant_type: 'client_credentials',
+          scope: 'basic'
+        })
+      });
+
+      accessToken = response.data.access_token;
+      // Store the token in cache
+      cache.set('general_access_token', accessToken);
+      console.log('Received new general token from FatSecret API');
+    } else {
+      console.log('General token found in cache');
+    }
+
     res.json({ access_token: accessToken });
   } catch (error) {
-    console.error('Error occurred while requesting access token:', error);
+    console.error('Error occurred while handling general token request:', error);
     res.status(500).json({ error: error.message });
   }
 });
