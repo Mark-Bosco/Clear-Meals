@@ -13,14 +13,23 @@
    ```
 
 
-## Next Dev Steps:
+## TODO
+### Auth:
+- Revamp login warning messages
+- Enhance frontend for email verification 
+- Auto login after email verification
+- Delete account option
+- Move proxy server to cloud
 
-- Fix login warning message
-- Frontend for email verification
-- Delete account
+### Search:
 - Search suggestions
 - Food nutrional view
-- Create a function in SearchScreen to add a selected food to a meal (you'll need to manage meal state, possibly in a context or Redux).
-- Use DailyLog in your main app component or a dedicated screen to display the user's daily food intake.
-- Implement AsyncStorage to save and load DailyLog data.
-- Consider creating a MealContext or using Redux to manage the global state of meals and daily logs.
+- Implement lcal storage to add a selected food to a meal and update the daily log
+
+### Home:
+- Load the daily log to display it on the home screen
+- Allow edits to logged foods from main menu
+- Settings screen (logout, delete account, load/export daily logs)
+
+### Calendar:
+- Calendar screen to load past meal logs

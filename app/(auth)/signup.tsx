@@ -27,6 +27,7 @@ export default function SignUp() {
           sendEmailVerification(userCredential.user)
             .then(() => {
               setValue({ ...currentValue, error: 'Verification email sent. Please check your inbox.' });
+              router.replace('/(auth)/verify-email');
             })
             .catch((error) => {
               console.error("Error sending verification email", error);

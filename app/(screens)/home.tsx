@@ -72,7 +72,7 @@ const Home = () => {
       {/* Total Calories */}
       <Pressable className="mx-4 my-2" onPress={() => toggleMenu('nutMenu')}>
         <Text className="text-6xl font-bold text-center">{totalCalories}<Text className="font-normal text-gray-500"> Cals</Text></Text>
-        <Text className="text-3xl text-gray-500 font-semibold">{user?.email}</Text>
+        <Text className="text-3xl text-gray-500 font-semibold">Debug: {user?.email}</Text>
       </Pressable>
 
       {/* Hidden Nurtients */}

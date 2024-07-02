@@ -24,7 +24,7 @@ export default function VerifyEmail() {
     <View className="flex-1 pt-20 bg-white items-center justify-top p-4">
       <Text className="text-2xl font-bold mb-4">Verify Your Email</Text>
       <Text className="text-center mb-4">
-        Please verify your email address. Check your inbox for a verification link.
+        Please verify your email address. Check your inbox for a verification link. Sign in once your email is verified.
       </Text>
       {error && <Text className="text-red-500 mb-4">{error}</Text>}
       <Pressable
@@ -37,7 +37,7 @@ export default function VerifyEmail() {
         className="mt-4"
         onPress={() => router.replace('/(auth)/signin')}
       >
-        <Text className="text-gray-600">Back to Sign In</Text>
+        <Text className="font-bold text-gray-600">Continue to Sign In</Text>
       </Pressable>
     </View>
   );
