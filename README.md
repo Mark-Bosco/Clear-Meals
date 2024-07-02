@@ -30,6 +30,10 @@
 - Load the daily log to display it on the home screen
 - Allow edits to logged foods from main menu
 - Settings screen (logout, delete account, load/export daily logs)
+- Empty daily log message
 
-### Calendar:
+### History:
 - Calendar screen to load past meal logs
+
+### Future:
+- Save user's daily logs to cloud and sync when logged in
