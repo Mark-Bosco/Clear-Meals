@@ -6,27 +6,34 @@ interface FoodThumbnail {
     food_id: string;
     food_name: string;
     brand_name?: string;
-    calories: number;
+    food_description: string;
 }
 
-const FoodItem = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress: () => void }) => (
+const getCalories = (description: string): string => {
+    const calorieMatch = description.match(/Calories: (\d+)kcal/);
+    return calorieMatch ? calorieMatch[1] : "N/A";
+};
+
+const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress: () => void }) => (
     <Pressable
-        className="mx-6 my-2 bg-gray-100 rounded-2xl p-4 flex-row justify-between items-center"
+        className="mx-6 my-2 bg-gray-100 rounded-2xl p-4"
         onPress={onPress}>
         {({ pressed }) => (
-            <>
-                <View>
-                    <Text className={`text-lg ${pressed ? 'text-gray-600' : 'text-black'}`}>
+            <View className="flex-row">
+                <View className="flex-1 pr-2">
+                    <Text className={`text-lg flex-wrap ${pressed ? 'text-gray-600' : 'text-black'}`}>
                         {item.food_name}
                     </Text>
                     <Text className={`text-sm ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
                         {item.brand_name || "Generic"}
                     </Text>
                 </View>
-                <Text className={`text-sm ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {item.calories} kcal
-                </Text>
-            </>
+                <View className="justify-center">
+                    <Text className={`text-sm ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {getCalories(item.food_description)} cals
+                    </Text>
+                </View>
+            </View>
         )}
     </Pressable>
 ));
@@ -64,7 +71,7 @@ const Search = () => {
     }, [hasMore, loading, handleSearch]);
 
     const renderFoodItem = useCallback(({ item }: { item: FoodThumbnail }) => (
-        <FoodItem 
+        <FoodResult 
             item={item} 
             onPress={() => console.log("Selected food:", item.food_name)}
         />

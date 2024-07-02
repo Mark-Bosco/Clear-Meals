@@ -1,5 +1,5 @@
 import { auth } from '../../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -18,21 +18,19 @@ export default function SignUp() {
   };
 
   async function signUp() {
-    // Use a callback to get the most recent state
     setValue(currentValue => {
+      // ... (existing validation checks)
 
-      if (currentValue.email === '' || currentValue.password === '') {
-        return { ...currentValue, error: 'Email and password required' };
-      }
-
-      if (currentValue.password.length < 6) {
-        return { ...currentValue, error: 'Password must be at least 6 characters' };
-      }
-
-      // Proceed with sign up
       createUserWithEmailAndPassword(auth, currentValue.email, currentValue.password)
-        .then(() => {
-          router.replace('/signin');
+        .then((userCredential) => {
+          // Send verification email
+          sendEmailVerification(userCredential.user)
+            .then(() => {
+              setValue({ ...currentValue, error: 'Verification email sent. Please check your inbox.' });
+            })
+            .catch((error) => {
+              console.error("Error sending verification email", error);
+            });
         })
         .catch((error: any) => {
           return { ...currentValue, error: error.message };

@@ -15,8 +15,9 @@
 
 ## Next Dev Steps:
 
-- Integrate user accounts with fatsecret API so that each user gets their own access token
-- Require email verification
+- Fix login warning message
+- Frontend for email verification
+- Delete account
 - Search suggestions
 - Food nutrional view
 - Create a function in SearchScreen to add a selected food to a meal (you'll need to manage meal state, possibly in a context or Redux).

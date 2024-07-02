@@ -1,5 +1,5 @@
 import { auth } from '../../firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -18,20 +18,37 @@ export default function SignIn() {
   };
 
   async function signIn() {
-    // Use a callback to get the most recent state
     setValue(currentValue => {
-
-      // Proceed with sign in
       signInWithEmailAndPassword(auth, currentValue.email, currentValue.password)
-        .then(() => {
-          router.replace('/(screens)/home');
-          return currentValue;
+        .then((userCredential) => {
+          if (userCredential.user.emailVerified) {
+            router.replace('/(screens)/home');
+          } else {
+            // Sign out the user immediately
+            auth.signOut().then(() => {
+              // Send verification email again
+              sendEmailVerification(userCredential.user)
+                .then(() => {
+                  return { 
+                    ...currentValue, 
+                    error: 'Your email is not verified. A new verification email has been sent. Please verify your email before signing in.' 
+                  };
+                })
+                .catch((error) => {
+                  console.error("Error sending verification email", error);
+                  return { 
+                    ...currentValue, 
+                    error: 'Your email is not verified. Please verify your email before signing in.' 
+                  };
+                });
+            });
+          }
         })
         .catch((error: any) => {
           return { ...currentValue, error: error.message };
         });
 
-      return { ...currentValue, error: 'Email or password invald' };
+      return currentValue;
     });
   }
 

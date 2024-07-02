@@ -1,3 +1,5 @@
+// In AuthContext.tsx
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { auth } from '../../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -5,17 +7,25 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
+  isEmailVerified: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({ user: null, isLoading: true });
+const AuthContext = createContext<AuthContextType>({ user: null, isLoading: true, isEmailVerified: false });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+      if (firebaseUser && firebaseUser.emailVerified) {
+        setUser(firebaseUser);
+        setIsEmailVerified(true);
+      } else {
+        setUser(null);
+        setIsEmailVerified(false);
+      }
       setIsLoading(false);
     });
 
@@ -23,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading, isEmailVerified }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,3 +1,5 @@
+// In index.tsx
+
 import { useAuth } from './(auth)/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
@@ -5,17 +7,21 @@ import { View, Text } from 'react-native';
 
 export default function Index() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isEmailVerified } = useAuth();
 
   useEffect(() => {
     if (!isLoading) {
       if (user) {
-        router.replace('/(screens)/home'); // Navigate to home screen if user is authenticated
+        if (isEmailVerified) {
+          router.replace('/(screens)/home');
+        } else {
+          router.replace('/(auth)/verify-email');
+        }
       } else {
-        router.replace('/(auth)/signin'); // Navigate to sign-in screen if user is not authenticated
+        router.replace('/(auth)/signin');
       }
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user, isEmailVerified, router]);
 
   if (isLoading) {
     return (
