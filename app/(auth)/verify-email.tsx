@@ -15,7 +15,7 @@ export default function VerifyEmail() {
         await sendEmailVerification(user);
         setError('Verification email sent. Please check your inbox.');
       } catch (error: any) {
-        setError(error.message);
+        setError('Failed to send verification email. Please try again later.');
       }
     }
   };

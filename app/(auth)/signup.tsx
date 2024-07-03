@@ -13,28 +13,46 @@ export default function SignUp() {
     error: ''
   });
 
-  const resetError = () => {
-    setValue({ ...value, error: '' });
+  const resetFields = () => {
+    setValue({
+      email: '',
+      password: '',
+      error: ''
+    });
   };
 
   async function signUp() {
-    setValue(currentValue => {
-      // ... (existing validation checks)
+    setValue((currentValue) => {
+      if (!currentValue.email || !currentValue.password) {
+        return { ...currentValue, error: 'Please enter both email and password.' };
+      }
 
       createUserWithEmailAndPassword(auth, currentValue.email, currentValue.password)
         .then((userCredential) => {
           // Send verification email
           sendEmailVerification(userCredential.user)
             .then(() => {
-              setValue({ ...currentValue, error: 'Verification email sent. Please check your inbox.' });
               router.replace('/(auth)/verify-email');
             })
-            .catch((error) => {
-              console.error("Error sending verification email", error);
+            .catch(() => {
+              setValue((prevValue) => ({ ...prevValue, error: 'Account created, but failed to send verification email. Please try to sign in to resend the verification email.' }));
             });
         })
-        .catch((error: any) => {
-          return { ...currentValue, error: error.message };
+        .catch((error) => {
+          // Handle different types of errors
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              setValue((prevValue) => ({ ...prevValue, error: 'This email is already in use. Please try a different email or sign in.' }));
+              break;
+            case 'auth/invalid-email':
+              setValue((prevValue) => ({ ...prevValue, error: 'Please enter a valid email.' }));
+              break;
+            case 'auth/weak-password':
+              setValue((prevValue) => ({ ...prevValue, error: 'Please use a password at least 6 characters long.' }));
+              break;
+            default:
+              setValue((prevValue) => ({ ...prevValue, error: 'An error occurred during sign up. Please try again.' }));
+          }
         });
 
       return currentValue;
@@ -58,7 +76,7 @@ export default function SignUp() {
             className="flex-1 ml-2"
             placeholder="Email"
             value={value.email}
-            onChangeText={(text) => setValue({ ...value, email: text })}
+            onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, email: text }))}
           />
         </View>
 
@@ -68,7 +86,7 @@ export default function SignUp() {
             className="flex-1 ml-2"
             placeholder="Password"
             value={value.password}
-            onChangeText={(text) => setValue({ ...value, password: text })}
+            onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, password: text }))}
             secureTextEntry={true}
           />
         </View>
@@ -87,7 +105,7 @@ export default function SignUp() {
         <Link href="/signin" asChild>
           <Pressable
             className="mt-4"
-            onPress={resetError}>
+            onPress={resetFields}>
             {({ pressed }) => (
               <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
                 Sign in

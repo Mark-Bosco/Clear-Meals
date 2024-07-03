@@ -13,12 +13,22 @@ export default function SignIn() {
     error: ''
   });
 
-  const resetError = () => {
-    setValue({ ...value, error: '' });
+  // Reset state when component unmounts or user navigates away
+  const resetFields = () => {
+    setValue({
+      email: '',
+      password: '',
+      error: ''
+    });
   };
 
   async function signIn() {
-    setValue(currentValue => {
+    setValue((currentValue) => {
+
+      if (!currentValue.email || !currentValue.password) {
+        return { ...currentValue, error: 'Please enter both email and password.' };
+      }
+
       signInWithEmailAndPassword(auth, currentValue.email, currentValue.password)
         .then((userCredential) => {
           if (userCredential.user.emailVerified) {
@@ -26,28 +36,15 @@ export default function SignIn() {
           } else {
             // Sign out the user immediately
             auth.signOut().then(() => {
-              // Send verification email again
-              sendEmailVerification(userCredential.user)
-                .then(() => {
-                  return { 
-                    ...currentValue, 
-                    error: 'Your email is not verified. A new verification email has been sent. Please verify your email before signing in.' 
-                  };
-                })
-                .catch((error) => {
-                  console.error("Error sending verification email", error);
-                  return { 
-                    ...currentValue, 
-                    error: 'Your email is not verified. Please verify your email before signing in.' 
-                  };
-                });
+              router.replace('/(auth)/verify-email');
             });
           }
         })
-        .catch((error: any) => {
-          return { ...currentValue, error: error.message };
+        .catch(() => {
+          setValue((prevValue) => ({ ...prevValue, error: 'Invalid email or password. Please try again.' }));
         });
 
+      // Return the current value without changes
       return currentValue;
     });
   }
@@ -62,8 +59,8 @@ export default function SignIn() {
         .then(() => {
           setValue({ ...currentValue, error: 'Password reset email sent!' });
         })
-        .catch((error) => {
-          setValue({ ...currentValue, error: error.message });
+        .catch(() => {
+          setValue((prevValue) => ({ ...prevValue, error: 'Invalid email. Please try again.' }));
         });
 
       return currentValue;
@@ -87,7 +84,7 @@ export default function SignIn() {
             className="flex-1 ml-2"
             placeholder="Email"
             value={value.email}
-            onChangeText={(text) => setValue({ ...value, email: text })}
+            onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, email: text }))}
           />
         </View>
 
@@ -97,7 +94,7 @@ export default function SignIn() {
             className="flex-1 ml-2"
             placeholder="Password"
             value={value.password}
-            onChangeText={(text) => setValue({ ...value, password: text })}
+            onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, password: text }))}
             secureTextEntry={true}
           />
         </View>
@@ -127,7 +124,7 @@ export default function SignIn() {
         <Link href="/signup" asChild>
           <Pressable
             className="mt-4"
-            onPress={resetError}>
+            onPress={resetFields}>
             {({ pressed }) => (
               <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
                 Sign up
