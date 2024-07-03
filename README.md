@@ -15,9 +15,7 @@
 
 ## TODO
 ### Auth:
-- Revamp login warning messages
-- Enhance frontend for email verification 
-- Auto login after email verification
+- Test email verification error message
 - Delete account option
 - Move proxy server to cloud
 
