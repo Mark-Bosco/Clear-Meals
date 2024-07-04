@@ -15,7 +15,6 @@
 
 ## TODO
 ### Auth:
-- Test email verification error message
 - Delete account option
 - Move proxy server to cloud
 

@@ -21,15 +21,15 @@ const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress
         {({ pressed }) => (
             <View className="flex-row">
                 <View className="flex-1 pr-2">
-                    <Text className={`text-lg flex-wrap ${pressed ? 'text-gray-600' : 'text-black'}`}>
+                    <Text className={`text-lg font-bold flex-wrap ${pressed ? 'text-gray-600' : 'text-black'}`}>
                         {item.food_name}
                     </Text>
-                    <Text className={`text-sm ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Text className={`text-lg ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
                         {item.brand_name || "Generic"}
                     </Text>
                 </View>
                 <View className="justify-center">
-                    <Text className={`text-sm ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Text className={`text-lg ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
                         {getCalories(item.food_description)} cals
                     </Text>
                 </View>
