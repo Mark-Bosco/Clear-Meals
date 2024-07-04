@@ -1,5 +1,5 @@
 import { auth } from '../../firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
@@ -34,10 +34,7 @@ export default function SignIn() {
           if (userCredential.user.emailVerified) {
             router.replace('/(screens)/home');
           } else {
-            // Sign out the user immediately
-            auth.signOut().then(() => {
-              router.replace('/(auth)/verify-email');
-            });
+            router.replace('/(auth)/verify-email');
           }
         })
         .catch(() => {

@@ -1,4 +1,4 @@
-import { AuthProvider } from "./(auth)/AuthContext"; // Adjust the import path as needed
+import { AuthProvider } from "./(auth)/AuthContext";
 import { Stack } from "expo-router";
 import "../global.css";
 

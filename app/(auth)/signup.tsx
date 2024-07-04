@@ -35,7 +35,7 @@ export default function SignUp() {
               router.replace('/(auth)/verify-email');
             })
             .catch(() => {
-              setValue((prevValue) => ({ ...prevValue, error: 'Account created, but failed to send verification email. Please try to sign in to resend the verification email.' }));
+              setValue((prevValue) => ({ ...prevValue, error: 'Account created, but failed to send verification email. Sign in to resend the verification email.' }));
             });
         })
         .catch((error) => {
