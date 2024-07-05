@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator } from "react-native";
 import { searchFood } from "../../backend/api";
+import { router } from "expo-router";
 
-interface FoodThumbnail {
+interface FoodPreview {
     food_id: string;
     food_name: string;
     brand_name?: string;
@@ -20,7 +21,7 @@ const getServingSize = (description: string): string => {
     return match ? match[0] : '';
 }
 
-const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress: () => void }) => (
+const FoodResult = React.memo(({ item, onPress }: { item: FoodPreview; onPress: () => void }) => (
     <Pressable
         className="mx-6 my-2 bg-gray-100 rounded-2xl p-4"
         onPress={onPress}>
@@ -49,7 +50,7 @@ const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress
 
 const Search = () => {
     const [query, setQuery] = useState<string>("");
-    const [searchResults, setSearchResults] = useState<FoodThumbnail[]>([]);
+    const [searchResults, setSearchResults] = useState<FoodPreview[]>([]);
     const [page, setPage] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
@@ -79,14 +80,17 @@ const Search = () => {
         }
     }, [hasMore, loading, handleSearch]);
 
-    const renderFoodItem = useCallback(({ item }: { item: FoodThumbnail }) => (
-        <FoodResult 
-            item={item} 
-            onPress={() => console.log("Selected food:", item.food_name)}
+    const renderFoodItem = useCallback(({ item }: { item: FoodPreview }) => (
+        <FoodResult
+            item={item}
+            onPress={() => router.push({
+                pathname: '/(screens)/nutrition',
+                params: { foodId: item.food_id }
+            })}
         />
     ), []);
 
-    const keyExtractor = useCallback((item: FoodThumbnail) => item.food_id, []);
+    const keyExtractor = useCallback((item: FoodPreview) => item.food_id, []);
 
     const renderFooter = useMemo(() => {
         if (!loading) return null;

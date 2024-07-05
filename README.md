@@ -22,6 +22,7 @@
 - Search suggestions
 - Food nutrional view
 - Implement lcal storage to add a selected food to a meal and update the daily log
+- No results screen
 
 ### Home:
 - Load the daily log to display it on the home screen

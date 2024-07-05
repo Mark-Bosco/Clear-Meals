@@ -1,12 +1,11 @@
 import { auth } from '../../firebase';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link, useRouter } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 export default function SignIn() {
-  const router = useRouter();
   const [value, setValue] = React.useState({
     email: '',
     password: '',

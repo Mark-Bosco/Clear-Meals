@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useAuth } from './AuthContext';
 import { sendEmailVerification } from 'firebase/auth';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 
 export default function VerifyEmail() {
   const { user } = useAuth();
-  const router = useRouter();
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 

@@ -56,4 +56,34 @@ const searchFood = async (query: string, page: number = 1) => {
   }
 };
 
-export { searchFood };
+const getFood = async (foodId: string) => {
+  const accessToken = await getAccessToken();
+
+  //console.log('Searching for food:', query, 'Page:', page);
+
+  try {
+    const response = await axios.post(
+      'https://platform.fatsecret.com/rest/server.api',
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        params: {
+          method: 'food.get.v4',
+          food_id: foodId,
+          format: 'json',
+        }
+      }
+    );
+
+    //console.log('Received response from the FatSecret API:', response.data);
+    return response.data;
+  } catch (error) {
+    //console.error('Error searching food', error);
+    throw error;
+  }
+};
+
+export { searchFood, getFood };
