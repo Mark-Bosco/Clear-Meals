@@ -6,7 +6,7 @@ const proxyIp = Constants.expoConfig?.extra?.proxyIp;
 
 // Get access token from the backend
 const getAccessToken = async () => {
-  console.log('Requesting access token from the backend...');
+  //console.log('Requesting access token from the backend...');
 
   try {
     const user = auth.currentUser;
@@ -16,10 +16,10 @@ const getAccessToken = async () => {
 
     const idToken = await user.getIdToken();
     const response = await axios.post(`http://${proxyIp}:3000/user-token`, { idToken });
-    console.log('Received response from the backend:', response.data);
+    //console.log('Received response from the backend:', response.data);
     return response.data.access_token;
   } catch (error: any) {
-    console.error('Error getting access token', error);
+    //console.error('Error getting access token', error);
     throw error;
   }
 };
@@ -27,7 +27,7 @@ const getAccessToken = async () => {
 const searchFood = async (query: string, page: number = 1) => {
   const accessToken = await getAccessToken();
 
-  console.log('Searching for food:', query, 'Page:', page);
+  //console.log('Searching for food:', query, 'Page:', page);
 
   try {
     const response = await axios.post(
@@ -48,10 +48,10 @@ const searchFood = async (query: string, page: number = 1) => {
       }
     );
 
-    console.log('Received response from the FatSecret API:', response.data);
+    //console.log('Received response from the FatSecret API:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error searching food', error);
+    //console.error('Error searching food', error);
     throw error;
   }
 };

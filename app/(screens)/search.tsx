@@ -14,6 +14,12 @@ const getCalories = (description: string): string => {
     return calorieMatch ? calorieMatch[1] : "N/A";
 };
 
+const getServingSize = (description: string): string => {
+    const regex = /Per\s+[\d\/]+\s*\w+/;
+    const match = description.match(regex);
+    return match ? match[0] : '';
+}
+
 const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress: () => void }) => (
     <Pressable
         className="mx-6 my-2 bg-gray-100 rounded-2xl p-4"
@@ -29,8 +35,11 @@ const FoodResult = React.memo(({ item, onPress }: { item: FoodThumbnail; onPress
                     </Text>
                 </View>
                 <View className="justify-center">
-                    <Text className={`text-lg ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Text className={`text-lg text-right ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
                         {getCalories(item.food_description)} cals
+                    </Text>
+                    <Text className={`text-md text-right ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {getServingSize(item.food_description)}
                     </Text>
                 </View>
             </View>
