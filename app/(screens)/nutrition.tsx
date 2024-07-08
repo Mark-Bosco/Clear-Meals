@@ -52,7 +52,7 @@ const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: nu
     const isMetricServing = nutritionFacts.measurement_description === nutritionFacts.metric_serving_unit;
 
     return (
-        <View className="border border-black p-4 mb-5">
+        <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
             <Text className="text-3xl text-left font-bold mb-1">Nutrition Facts</Text>
             <View className="border-b border-black my-1" />
             <NutritionRow
@@ -243,28 +243,32 @@ const Nutrition: React.FC = () => {
                     scaledServingSize={parseFloat(scaledServingSize)}
                 />
             </ScrollView>
-            <View className="mt-5">
-                <Text>Serving Type:</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-2">
+            <View>
+                <Text className='text-2xl font-bold'>Serving Type:</Text>
+                <View className="border-b border-black my-2" />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="">
                     {servings.map((serving, index) => (
                         <Pressable
                             key={index}
-                            className={`mr-2 p-2 border border-gray-300 rounded ${selectedServing === index ? 'bg-blue-200' : ''}`}
+                            className={`mr-2 p-2 border border-gray-300 rounded ${selectedServing === index ? 'bg-green-700' : 'bg-gray-500'}`}
                             onPress={() => setSelectedServing(index)}
                         >
-                            <Text>{serving.serving_description}</Text>
+                            <Text className='text-lg text-white'>{serving.serving_description}</Text>
                         </Pressable>
                     ))}
                 </ScrollView>
-                <View className="flex-row items-center justify-between mb-2">
+            </View>
+            <View>
+                <View className="border-b border-black my-2" />
+                <View className="flex-row items-center justify-center mb-2">
                     <View className="flex-row items-center">
                         <TextInput
-                            className="border border-gray-300 rounded px-2 py-1"
+                            className="border border-gray-300 text-xl rounded px-2 py-1"
                             keyboardType="numeric"
                             value={scaledServingSize}
                             onChangeText={handleServingSizeChange}
                         />
-                        <Text className="ml-2">{unit}</Text>
+                        <Text className="ml-2 text-xl font-bold">{unit}</Text>
                     </View>
                 </View>
             </View>
