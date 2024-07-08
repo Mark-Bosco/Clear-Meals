@@ -53,7 +53,7 @@ const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: nu
 
     return (
         <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
-            <Text className="text-3xl text-left font-bold mb-1">Nutrition Facts</Text>
+            <Text className="text-4xl text-left font-bold mb-1">Nutrition Facts</Text>
             <View className="border-b border-black my-1" />
             <NutritionRow
                 label="Serving Size"
@@ -123,7 +123,8 @@ const Nutrition: React.FC = () => {
             if (!foodId) return;
             try {
                 const result = await getFood(foodId);
-                setSelectedFood(result.food);
+                let foodWithDefaultServings = createDefaultMetricServingSizes(result.food, selectedServing);
+                setSelectedFood(foodWithDefaultServings);
             } catch (err) {
                 console.error(err);
             }
@@ -131,56 +132,56 @@ const Nutrition: React.FC = () => {
         fetchData();
     }, [foodId]);
 
-    /* Create default metric serving sizes
-    useEffect(() => {
-        if (selectedFood) {
-            const servings = [...selectedFood.servings.serving];
-            const serving = servings[selectedServing];
-            const metricAmount = parseFloat(serving.metric_serving_amount);
-            const metricUnit = serving.metric_serving_unit.toLowerCase();
-    
-            let newServings = [...servings];
-    
-            if (metricUnit === 'oz' || metricUnit === 'g') {
-                // Add or update oz serving
-                const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
-                const ozIndex = newServings.findIndex(s => s.measurement_description === 'oz');
-                const ozServing: NutritionFacts = {
-                    ...serving,
-                    serving_description: `${ozAmount.toFixed(2)} oz`,
-                    measurement_description: 'oz',
-                    metric_serving_amount: ozAmount.toString(),
-                    metric_serving_unit: 'oz'
-                };
-                if (ozIndex !== -1) {
-                    newServings[ozIndex] = ozServing;
-                } else {
-                    newServings.push(ozServing);
-                }
-    
-                // Add or update g serving
-                const gAmount = metricUnit === 'g' ? metricAmount : ozToGrams(metricAmount);
-                const gIndex = newServings.findIndex(s => s.measurement_description === 'g');
-                const gServing: NutritionFacts = {
-                    ...serving,
-                    serving_description: `${gAmount.toFixed(0)} g`,
-                    measurement_description: 'g',
-                    metric_serving_amount: gAmount.toString(),
-                    metric_serving_unit: 'g'
-                };
-                if (gIndex !== -1) {
-                    newServings[gIndex] = gServing;
-                } else {
-                    newServings.push(gServing);
-                }
+
+    const createDefaultMetricServingSizes = (food: SelectedFood, selectedServing: number) => {
+        // Make a deep copy of the servings array to avoid direct state mutation
+        let newServings = food.servings.serving.map(serving => ({ ...serving }));
+
+        const serving = newServings[selectedServing];
+        const metricAmount = parseFloat(serving.metric_serving_amount);
+        const metricUnit = serving.metric_serving_unit.toLowerCase();
+
+        if (metricUnit === 'oz' || metricUnit === 'g') {
+            // Add or update oz serving
+            const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
+            const ozIndex = newServings.findIndex(s => s.measurement_description === 'oz');
+            const ozServing: NutritionFacts = {
+                ...serving,
+                serving_description: `${ozAmount.toFixed(2)} oz (generic)`,
+                measurement_description: 'oz',
+                metric_serving_amount: ozAmount.toString(),
+                metric_serving_unit: 'oz'
+            };
+            if (ozIndex !== -1) {
+                newServings[ozIndex] = ozServing;
+            } else {
+                newServings.push(ozServing);
             }
-    
-            setSelectedFood(prevFood => ({
-                ...prevFood!,
-                servings: { serving: newServings }
-            }));
+
+            // Add or update g serving
+            const gAmount = metricUnit === 'g' ? metricAmount : ozToGrams(metricAmount);
+            const gIndex = newServings.findIndex(s => s.measurement_description === 'g');
+            const gServing: NutritionFacts = {
+                ...serving,
+                serving_description: `${gAmount.toFixed(0)} g (generic)`,
+                measurement_description: 'g',
+                metric_serving_amount: gAmount.toString(),
+                metric_serving_unit: 'g'
+            };
+            if (gIndex !== -1) {
+                newServings[gIndex] = gServing;
+            } else {
+                newServings.push(gServing);
+            }
         }
-    }, [foodId]); */
+
+        return {
+            ...food,
+            servings: { serving: newServings }
+        };
+    };
+
+
 
     // Update default manual serving size when selected serving changes
     useEffect(() => {
@@ -235,8 +236,8 @@ const Nutrition: React.FC = () => {
     return (
         <SafeAreaView className="flex-1 bg-white mt-10 p-4">
             <ScrollView>
-                <Text className="text-3xl text-center font-bold">{selectedFood.food_name}</Text>
-                <Text className="text-2xl text-center mb-6">{selectedFood.brand_name || "Generic"}</Text>
+                <Text className="text-5xl text-center font-bold">{selectedFood.food_name}</Text>
+                <Text className="text-3xl text-center mb-6">{selectedFood.brand_name || "Generic"}</Text>
                 <NutritionLabel
                     nutritionFacts={servings[selectedServing]}
                     scaleFactor={scaleFactor}
@@ -244,7 +245,7 @@ const Nutrition: React.FC = () => {
                 />
             </ScrollView>
             <View>
-                <Text className='text-2xl font-bold'>Serving Type:</Text>
+                <Text className='text-3xl font-bold'>Serving Type:</Text>
                 <View className="border-b border-black my-2" />
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="">
                     {servings.map((serving, index) => (
