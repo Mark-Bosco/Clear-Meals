@@ -58,7 +58,7 @@ const Home = () => {
   };
 
   return (
-    <View className="flex-1 bg-white pt-10">
+    <View className="flex-1 bg-white mt-10">
       <View className="px-4 py-2 flex-row justify-between items-center">
         <Pressable onPress={() => { }}>
           <Ionicons name="calendar-clear-outline" size={36} color="gray" />
