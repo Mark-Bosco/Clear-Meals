@@ -48,7 +48,7 @@ const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: nu
         return decimals === 0 ? Math.round(value).toString() : value.toFixed(decimals);
     };
 
-    const formattedMetricServing = `(${formatValue(scaledNutritionFacts.metric_serving_amount)} ${nutritionFacts.metric_serving_unit})`;
+    const formattedMetricServing = `(${formatValue(scaledNutritionFacts.metric_serving_amount, 0)} ${nutritionFacts.metric_serving_unit})`;
     const isMetricServing = nutritionFacts.measurement_description === nutritionFacts.metric_serving_unit;
 
     return (
@@ -146,36 +146,34 @@ const Nutrition: React.FC = () => {
         // BUG HERE: metricUnit may not be defined *****************
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
 
+        const hasOz = newServings.some(s => s.serving_description.split(' ')[1]?.replace(/,$/g, '') === 'oz');
+        const hasGram = newServings.some(s => s.serving_description.split(' ')[1]?.replace(/,$/g, '') === 'g');
+
+
         if (metricUnit === 'oz' || metricUnit === 'g') {
-            // Add or update oz serving
-            const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
-            const ozIndex = newServings.findIndex(s => s.measurement_description === 'oz');
-            const ozServing: NutritionFacts = {
-                ...firstServing,
-                serving_description: `${ozAmount.toFixed(2)} oz (generic)`,
-                measurement_description: 'oz',
-                metric_serving_amount: ozAmount.toString(),
-                metric_serving_unit: 'oz'
-            };
-            if (ozIndex !== -1) {
-                newServings[ozIndex] = ozServing;
-            } else {
-                newServings.push(ozServing);
+            if (!hasOz) {
+                // Add oz serving
+                const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
+                const ozServing: NutritionFacts = {
+                    ...firstServing,
+                    serving_description: `${ozAmount.toFixed(2)} oz`,
+                    measurement_description: 'oz',
+                    metric_serving_amount: ozAmount.toString(),
+                    metric_serving_unit: 'oz'
+                };
+                newServings.push(ozServing)
             }
 
-            // Add or update g serving
-            const gAmount = metricUnit === 'g' ? metricAmount : ozToGrams(metricAmount);
-            const gIndex = newServings.findIndex(s => s.measurement_description === 'g');
-            const gServing: NutritionFacts = {
-                ...firstServing,
-                serving_description: `${gAmount.toFixed(0)} g (generic)`,
-                measurement_description: 'g',
-                metric_serving_amount: gAmount.toString(),
-                metric_serving_unit: 'g'
-            };
-            if (gIndex !== -1) {
-                newServings[gIndex] = gServing;
-            } else {
+            if (!hasGram) {
+                // Add g serving
+                const gAmount = metricUnit === 'g' ? metricAmount : ozToGrams(metricAmount);
+                const gServing: NutritionFacts = {
+                    ...firstServing,
+                    serving_description: `${gAmount.toFixed(0)} g`,
+                    measurement_description: 'g',
+                    metric_serving_amount: gAmount.toString(),
+                    metric_serving_unit: 'g'
+                };
                 newServings.push(gServing);
             }
         }
@@ -319,7 +317,7 @@ const Nutrition: React.FC = () => {
                     </View>
                     <View className="ml-10 flex-row items-center">
                         <TextInput
-                            className="border border-gray-300 text-xl rounded px-2 py-1 w-20"
+                            className="border border-gray-300 text-xl rounded px-2 py-1"
                             keyboardType="numeric"
                             value={scaledCalories}
                             onChangeText={handleCalorieChange}
