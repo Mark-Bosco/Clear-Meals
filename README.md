@@ -20,9 +20,10 @@
 
 ### Search:
 - Search suggestions
-- Food nutrional view
-- Implement lcal storage to add a selected food to a meal and update the daily log
-- No results screen
+- Added food list on search screen
+- Implement local storage to add a selected food to a meal and update the daily log
+- Screen for no results
+- Make generic food load first?
 
 ### Home:
 - Load the daily log to display it on the home screen

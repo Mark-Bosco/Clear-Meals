@@ -36,7 +36,7 @@ interface NutritionFacts {
     iron?: string;
 }
 
-const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: number; scaledServingSize: number; }> = ({ nutritionFacts, scaleFactor, scaledServingSize }) => {
+const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: number; scaledServingSize: number; scaledCalories: number; }> = ({ nutritionFacts, scaleFactor, scaledServingSize, scaledCalories }) => {
     // Scale nutrition facts by scale factor (custom serving size)
     const scaledNutritionFacts: Record<string, number | undefined> = Object.fromEntries(
         Object.entries(nutritionFacts).map(([key, value]) => [key, value ? parseFloat(value) * scaleFactor : undefined])
@@ -57,12 +57,12 @@ const NutritionLabel: React.FC<{ nutritionFacts: NutritionFacts; scaleFactor: nu
             <View className="border-b border-black my-1" />
             <NutritionRow
                 label="Serving Size"
-                value={`${scaledServingSize} ${nutritionFacts.serving_description.split(' ')[1]?.replace(/,$/g, '')}`}
+                value={`${scaledServingSize || ''} ${nutritionFacts.serving_description.split(' ')[1]?.replace(/,$/g, '')}`}
                 unit={isMetricServing ? "" : formattedMetricServing}
                 bold={true}
             />
             <View className="border-b border-black my-1" />
-            <NutritionRow label="Calories" value={formatValue(scaledNutritionFacts.calories, 0)} unit="" bold={true} largerFont={true} />
+            <NutritionRow label="Calories" value={scaledCalories} unit="" bold={true} largerFont={true} />
             <View className="border-b border-black my-1" />
             <NutritionRow label="Total Fat" value={formatValue(scaledNutritionFacts.fat)} unit="g" bold={true} />
             <NutritionRow label="  Saturated Fat" value={formatValue(scaledNutritionFacts.saturated_fat)} unit="g" indent />
@@ -109,21 +109,25 @@ const Nutrition: React.FC = () => {
     // Food item selected from search results
     const [selectedFood, setSelectedFood] = useState<SelectedFood | null>(null);
     // Selected serving type index
-    const [selectedServing, setSelectedServing] = useState(0);
+    const [selectedServingIndex, setSelectedServing] = useState(0);
     // Scale factor for serving size
     const [scaleFactor, setScaleFactor] = useState(1);
     // Scaled serving size
     const [scaledServingSize, setScaledServingSize] = useState('');
+    // Base calories
+    const [baseCalories, setBaseCalories] = useState('0');
+    // Scaled calories
+    const [scaledCalories, setScaledCalories] = useState('');
     // Reciprocal for fractions
     const [reciprocal, setReciprocal] = useState(1);
 
-    // Fetch food data on mount
+    // Fetch food data on mount, initalize scaled calories
     useEffect(() => {
         const fetchData = async () => {
             if (!foodId) return;
             try {
                 const result = await getFood(foodId);
-                let foodWithDefaultServings = createDefaultMetricServingSizes(result.food, selectedServing);
+                let foodWithDefaultServings = createDefaultMetricServingSizes(result.food);
                 setSelectedFood(foodWithDefaultServings);
             } catch (err) {
                 console.error(err);
@@ -133,20 +137,21 @@ const Nutrition: React.FC = () => {
     }, [foodId]);
 
 
-    const createDefaultMetricServingSizes = (food: SelectedFood, selectedServing: number) => {
+    const createDefaultMetricServingSizes = (food: SelectedFood) => {
         // Make a deep copy of the servings array to avoid direct state mutation
         let newServings = food.servings.serving.map(serving => ({ ...serving }));
 
-        const serving = newServings[selectedServing];
-        const metricAmount = parseFloat(serving.metric_serving_amount);
-        const metricUnit = serving.metric_serving_unit.toLowerCase();
+        const firstServing = newServings[0];
+        const metricAmount = parseFloat(firstServing.metric_serving_amount);
+        // BUG HERE: metricUnit may not be defined *****************
+        const metricUnit = firstServing.metric_serving_unit.toLowerCase();
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
             // Add or update oz serving
             const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
             const ozIndex = newServings.findIndex(s => s.measurement_description === 'oz');
             const ozServing: NutritionFacts = {
-                ...serving,
+                ...firstServing,
                 serving_description: `${ozAmount.toFixed(2)} oz (generic)`,
                 measurement_description: 'oz',
                 metric_serving_amount: ozAmount.toString(),
@@ -162,7 +167,7 @@ const Nutrition: React.FC = () => {
             const gAmount = metricUnit === 'g' ? metricAmount : ozToGrams(metricAmount);
             const gIndex = newServings.findIndex(s => s.measurement_description === 'g');
             const gServing: NutritionFacts = {
-                ...serving,
+                ...firstServing,
                 serving_description: `${gAmount.toFixed(0)} g (generic)`,
                 measurement_description: 'g',
                 metric_serving_amount: gAmount.toString(),
@@ -181,12 +186,10 @@ const Nutrition: React.FC = () => {
         };
     };
 
-
-
-    // Update default manual serving size when selected serving changes
+    // Update default editable serving size and calories when selected serving changes
     useEffect(() => {
         if (selectedFood) {
-            const serving = selectedFood.servings.serving[selectedServing];
+            const serving = selectedFood.servings.serving[selectedServingIndex];
             const [initialServingSize] = serving.serving_description.split(' ');
 
             let newScaledServingSize: string = initialServingSize;
@@ -201,27 +204,69 @@ const Nutrition: React.FC = () => {
                 newReciprocal = (1 / parseFloat(decimal));
             }
 
-            setScaledServingSize(newScaledServingSize);
+            setBaseCalories(serving.calories || '0');
+            setScaledCalories(serving.calories || '0');
+            setScaledServingSize(parseFloat(newScaledServingSize) > 0 ? newScaledServingSize : '0');
             setReciprocal(newReciprocal);
             setScaleFactor(1);
         }
-    }, [selectedFood, selectedServing]);
+    }, [selectedFood, selectedServingIndex]);
 
     // Update scale factor when manual serving size changes
     const handleServingSizeChange = (value: string) => {
         const factor = parseFloat(value);
 
         if (!isNaN(factor) && factor >= 0) {
+            const newScaleFactor = factor * reciprocal;
             // Update serving size number in input box
             setScaledServingSize(value);
             // Update scale factor
-            setScaleFactor(factor * reciprocal);
-
+            setScaleFactor(newScaleFactor);
+            // Update calories input
+            setScaledCalories((newScaleFactor * parseFloat(baseCalories)).toFixed(0));
         } else if (value === '.') {
             setScaledServingSize('0.');
-        }
-        else if (value === '') {
+            setScaleFactor(0);
+            setScaledCalories('0');
+        } else if (value === '') {
             setScaledServingSize('');
+            setScaleFactor(0);
+            setScaledCalories('0');
+        } else {
+            // Invalid input, revert to previous valid state
+            setScaledServingSize(prevSize => prevSize);
+        }
+    };
+
+    const handleCalorieChange = (value: string) => {
+        const calories = parseFloat(value);
+        const selectedServing = selectedFood?.servings.serving[selectedServingIndex];
+
+        if (!isNaN(calories) && calories >= 0) {
+            setScaledCalories(value);
+
+            // Avoid division by zero
+            const originalCalories = parseFloat(selectedServing?.calories || '0');
+
+            if (originalCalories > 0) {
+                // Determine scale factor
+                const newScaleFactor = calories / originalCalories;
+                setScaleFactor(newScaleFactor);
+
+                // Update serving size input
+                setScaledServingSize((newScaleFactor / reciprocal).toFixed(2));
+            }
+        } else if (value === '.') {
+            setScaledCalories(value);
+            setScaleFactor(0);
+            setScaledServingSize('0');
+        } else if (value === '') {
+            setScaledCalories('');
+            setScaleFactor(0);
+            setScaledServingSize('0');
+        } else {
+            // Invalid input, revert to previous valid state
+            setScaledCalories(prevCalories => prevCalories);
         }
     };
 
@@ -231,7 +276,7 @@ const Nutrition: React.FC = () => {
     // Get selected serving type
     const servings = selectedFood.servings.serving;
 
-    const unit = servings[selectedServing].serving_description.split(' ')[1]?.replace(/,$/g, '');
+    const unit = servings[selectedServingIndex].serving_description.split(' ')[1]?.replace(/,$/g, '');
 
     return (
         <SafeAreaView className="flex-1 bg-white mt-10 p-4">
@@ -239,9 +284,10 @@ const Nutrition: React.FC = () => {
                 <Text className="text-5xl text-center font-bold">{selectedFood.food_name}</Text>
                 <Text className="text-3xl text-center mb-6">{selectedFood.brand_name || "Generic"}</Text>
                 <NutritionLabel
-                    nutritionFacts={servings[selectedServing]}
+                    nutritionFacts={servings[selectedServingIndex]}
                     scaleFactor={scaleFactor}
                     scaledServingSize={parseFloat(scaledServingSize)}
+                    scaledCalories={parseFloat(scaledCalories)}
                 />
             </ScrollView>
             <View>
@@ -251,7 +297,7 @@ const Nutrition: React.FC = () => {
                     {servings.map((serving, index) => (
                         <Pressable
                             key={index}
-                            className={`mr-2 p-2 border border-gray-300 rounded ${selectedServing === index ? 'bg-green-700' : 'bg-gray-500'}`}
+                            className={`mr-2 p-2 border border-gray-300 rounded ${selectedServingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
                             onPress={() => setSelectedServing(index)}
                         >
                             <Text className='text-lg text-white'>{serving.serving_description}</Text>
@@ -270,6 +316,15 @@ const Nutrition: React.FC = () => {
                             onChangeText={handleServingSizeChange}
                         />
                         <Text className="ml-2 text-xl font-bold">{unit}</Text>
+                    </View>
+                    <View className="ml-10 flex-row items-center">
+                        <TextInput
+                            className="border border-gray-300 text-xl rounded px-2 py-1 w-20"
+                            keyboardType="numeric"
+                            value={scaledCalories}
+                            onChangeText={handleCalorieChange}
+                        />
+                        <Text className="ml-2 text-xl font-bold">cal</Text>
                     </View>
                 </View>
             </View>
