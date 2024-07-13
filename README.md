@@ -24,7 +24,10 @@
 - Implement local storage to add a selected food to a meal and update the daily log
 - Screen for no results
 - Make generic food load first?
-- On nutrition screen, make one change to a measurement type sync across all others
+
+### Nutrition Screen:
+- Add a swipe feature to increment serving size by its default value
+- Export food data
 
 ### Home:
 - Load the daily log to display it on the home screen

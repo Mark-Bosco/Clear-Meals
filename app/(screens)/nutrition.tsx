@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
 
@@ -314,47 +314,49 @@ const Nutrition: React.FC = () => {
                 />
             </ScrollView>
             <View>
-                <Text className='text-3xl font-bold'>Serving Type:</Text>
+                <View className='flex-row justify-between'>
+                    <Text className='text-3xl font-bold py-1'>Serving Type:</Text>
+                    <Pressable className="bg-gray-500 rounded px-4 justify-center active:bg-gray-600" onPress={() => setReset(true)}>
+                        <Text className="text-white text-xl font-bold">Reset</Text>
+                    </Pressable>
+                </View> 
                 <View className="border-b border-black my-2" />
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="">
                     {servings.map((serving, index) => (
                         <Pressable
                             key={index}
-                            className={`mr-2 p-2 border border-gray-300 rounded ${selectedServingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
+                            className={`mr-2 p-3 border border-gray-300 rounded ${selectedServingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
                             onPress={() => setSelectedServing(index)}
                         >
-                            <Text className='text-lg text-white'>{`${serving.serving_description.replace(/^\d+\/\d+|\d+\s*/, '').replace(/,$/g, '')}`}</Text>
+                            <Text className='text-2xl font-bold text-white'>{`${serving.serving_description.replace(/^\d+.\d+|\d+\s*/, '').replace(/,$/g, '')}`}</Text>
                         </Pressable>
                     ))}
                 </ScrollView>
             </View>
-            <View>
-                <View className="border-b border-black my-2" />
-                <View className="flex-row items-center justify-center mb-2">
+            <View className="border-b border-black my-2" />
+            <View className='bg-green-700 rounded-xl p-3 mt-2'>
+                <View className="flex-row items-center justify-center">
                     <View className="flex-row items-center">
                         <TextInput
-                            className="border border-gray-300 text-xl rounded px-2 py-1"
+                            className="bg-white text-xl rounded px-2 py-1"
                             keyboardType="numeric"
-                            value={scaledServingSize}
-                            onChangeText={handleServingSizeChange}
+                            defaultValue={scaledServingSize}
+                            onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
+                                handleServingSizeChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-xl font-bold">{unit}</Text>
+                        <Text className="ml-2 text-2xl text-white font-bold">{unit}</Text>
                     </View>
                     <View className="ml-10 flex-row items-center">
                         <TextInput
-                            className="border border-gray-300 text-xl rounded px-2 py-1"
+                            className="bg-white text-xl rounded px-2 py-1"
                             keyboardType="numeric"
-                            value={scaledCalories}
-                            onChangeText={handleCalorieChange}
+                            defaultValue={scaledCalories}
+                            onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
+                                handleCalorieChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-xl font-bold">cal</Text>
+                        <Text className="ml-2 text-2xl text-white font-bold">cal</Text>
                     </View>
                 </View>
-            </View>
-            <View>
-                <Pressable className="bg-green-700 p-2 rounded mt-2" onPress={() => setReset(true)}>
-                    <Text className="text-white text-lg font-bold text-center">Reset</Text>
-                </Pressable>
             </View>
         </SafeAreaView>
     );
