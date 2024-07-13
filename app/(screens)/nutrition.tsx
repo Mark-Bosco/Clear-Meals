@@ -120,6 +120,10 @@ const Nutrition: React.FC = () => {
     const [scaledCalories, setScaledCalories] = useState('');
     // Reciprocal for fractions
     const [reciprocal, setReciprocal] = useState(1);
+    // Flag for when a measurement is edited to start syncing
+    const [sync, setSync] = useState(false);
+    // Reset the calorie and serving size inputs back to default
+    const [reset, setReset] = useState(false);
 
     // Fetch food data on mount, initalize scaled calories
     useEffect(() => {
@@ -187,6 +191,7 @@ const Nutrition: React.FC = () => {
     // Update default editable serving size and calories when selected serving changes
     useEffect(() => {
         if (selectedFood) {
+
             const serving = selectedFood.servings.serving[selectedServingIndex];
             const [initialServingSize] = serving.serving_description.split(' ');
 
@@ -203,15 +208,25 @@ const Nutrition: React.FC = () => {
             }
 
             setBaseCalories(serving.calories || '0');
-            setScaledCalories(serving.calories || '0');
             setScaledServingSize(parseFloat(newScaledServingSize) > 0 ? newScaledServingSize : '0');
             setReciprocal(newReciprocal);
             setScaleFactor(1);
+
+            if (sync && !reset) {
+                handleCalorieChange(scaledCalories, newReciprocal);
+            } else {
+                setScaledCalories(serving.calories || '0');
+                if (reset) {
+                    setReset(false);
+                    setSync(false);
+                }
+            }
         }
-    }, [selectedFood, selectedServingIndex]);
+    }, [selectedFood, selectedServingIndex, reset]);
 
     // Update scale factor when manual serving size changes
     const handleServingSizeChange = (value: string) => {
+        setSync(true);
         const factor = parseFloat(value);
 
         if (!isNaN(factor) && factor >= 0) {
@@ -235,9 +250,11 @@ const Nutrition: React.FC = () => {
             setScaledServingSize(prevSize => prevSize);
         }
     };
+    const handleCalorieChange = (value: string, newReciprocal?: number) => {
+        setSync(true);
 
-    const handleCalorieChange = (value: string) => {
         const calories = parseFloat(value);
+
         const selectedServing = selectedFood?.servings.serving[selectedServingIndex];
 
         if (!isNaN(calories) && calories >= 0) {
@@ -249,10 +266,16 @@ const Nutrition: React.FC = () => {
             if (originalCalories > 0) {
                 // Determine scale factor
                 const newScaleFactor = calories / originalCalories;
+
                 setScaleFactor(newScaleFactor);
 
+                // Use the new reciprocal if provided, otherwise use the current state
+                const currentReciprocal = newReciprocal !== undefined ? newReciprocal : reciprocal;
+
                 // Update serving size input
-                setScaledServingSize((newScaleFactor / reciprocal).toFixed(2));
+                const newScaledServingSize = (newScaleFactor / currentReciprocal).toFixed(2);
+
+                setScaledServingSize(newScaledServingSize);
             }
         } else if (value === '.') {
             setScaledCalories(value);
@@ -263,10 +286,12 @@ const Nutrition: React.FC = () => {
             setScaleFactor(0);
             setScaledServingSize('0');
         } else {
-            // Invalid input, revert to previous valid state
-            setScaledCalories(prevCalories => prevCalories);
+            setScaledCalories(prevCalories => {
+                return prevCalories;
+            });
         }
     };
+
 
     // Loading state
     if (!selectedFood) return <SafeAreaView><Text>Loading...</Text></SafeAreaView>;
@@ -298,7 +323,7 @@ const Nutrition: React.FC = () => {
                             className={`mr-2 p-2 border border-gray-300 rounded ${selectedServingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
                             onPress={() => setSelectedServing(index)}
                         >
-                            <Text className='text-lg text-white'>{serving.serving_description}</Text>
+                            <Text className='text-lg text-white'>{`${serving.serving_description.replace(/^\d+\/\d+|\d+\s*/, '').replace(/,$/g, '')}`}</Text>
                         </Pressable>
                     ))}
                 </ScrollView>
@@ -325,6 +350,11 @@ const Nutrition: React.FC = () => {
                         <Text className="ml-2 text-xl font-bold">cal</Text>
                     </View>
                 </View>
+            </View>
+            <View>
+                <Pressable className="bg-green-700 p-2 rounded mt-2" onPress={() => setReset(true)}>
+                    <Text className="text-white text-lg font-bold text-center">Reset</Text>
+                </Pressable>
             </View>
         </SafeAreaView>
     );
