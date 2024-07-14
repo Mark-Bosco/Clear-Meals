@@ -95,10 +95,11 @@ const Home = () => {
           <View className="flex-column flex-1 items-left p-2">
             <Text className="font-semibold text-2xl">Vit A: <Text className="font-normal text-gray-500">1000mg</Text></Text>
             <Text className="font-semibold text-2xl">Vit C: <Text className="font-normal text-gray-500">1000mg</Text></Text>
-            <Text className="font-semibold text-2xl">Potas: <Text className="font-normal text-gray-500">1000mg</Text></Text>
+            <Text className="font-semibold text-2xl">Sugars: <Text className="font-normal text-gray-500">1000mg</Text></Text>
             <Text className="font-semibold text-2xl">Calcium: <Text className="font-normal text-gray-500">1000mg</Text></Text>
             <Text className="font-semibold text-2xl">Iron: <Text className="font-normal text-gray-500">1000mg</Text></Text>
             <Text className="font-semibold text-2xl">Sat Fat: <Text className="font-normal text-gray-500">1000mg</Text></Text>
+            <Text className="font-semibold text-2xl">Trans Fat: <Text className="font-normal text-gray-500">1000mg</Text></Text>
           </View>
         </View>
       )}

@@ -19,7 +19,7 @@
 - Move proxy server to cloud
 
 ### Search:
-- Search suggestions
+- Search suggestions (Hold off until I know if I can get premier access)
 - Added food list on search screen
 - Implement local storage to add a selected food to a meal and update the daily log
 - Screen for no results
