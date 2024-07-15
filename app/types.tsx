@@ -1,25 +1,25 @@
 
 // Represents a single global food item
-// I don't think I need serving size/type
-// I think I can just use calories to scale
 export interface FoodItem {
     food_id: string;
     food_name: string;
     brand_name?: string;
-    calories: string;
-    fat?: string;
-    saturated_fat?: string;
-    trans_fat?: string;
-    cholesterol?: string;
-    sodium?: string;
-    carbohydrates?: string;
-    fiber?: string;
-    sugar?: string;
-    protein?: string;
-    vitamin_a?: string;
-    vitamin_c?: string;
-    calcium?: string;
-    iron?: string;
+    serving_size: string;
+    serving_unit: string;
+    calories: number;
+    fat?: number;
+    saturated_fat?: number;
+    trans_fat?: number;
+    cholesterol?: number;
+    sodium?: number;
+    carbohydrates?: number;
+    fiber?: number;
+    sugar?: number;
+    protein?: number;
+    vitamin_a?: number;
+    vitamin_c?: number;
+    calcium?: number;
+    iron?: number;
   }
   
   // Represents a meal type (e.g., breakfast, lunch, dinner, snack)
