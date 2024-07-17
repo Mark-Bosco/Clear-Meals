@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
-import { raw } from 'express';
 
 const ozToGrams = (oz: number) => oz * 28.34952;
 const gramsToOz = (g: number) => g / 28.34952;
@@ -20,7 +19,6 @@ interface Serving {
     metric_serving_amount: string;
     metric_serving_unit: string;
     serving_description: string;
-    measurement_description: string;
     calories: string;
     fat?: string;
     saturated_fat?: string;
@@ -75,7 +73,6 @@ const Nutrition: React.FC = () => {
                 const ozServing: Serving = {
                     ...firstServing,
                     serving_description: `${ozAmount.toFixed(2)} oz`,
-                    measurement_description: 'oz',
                     metric_serving_amount: ozAmount.toString(),
                     metric_serving_unit: 'oz'
                 };
@@ -87,7 +84,6 @@ const Nutrition: React.FC = () => {
                 const gServing: Serving = {
                     ...firstServing,
                     serving_description: `${gAmount.toFixed(0)} g`,
-                    measurement_description: 'g',
                     metric_serving_amount: gAmount.toString(),
                     metric_serving_unit: 'g'
                 };
@@ -128,9 +124,8 @@ const Nutrition: React.FC = () => {
         const scaleFactor = rawScaleFactor / base
 
         const currServing: Serving = {
-            measurement_description: serving.measurement_description,
-            // Removes excess words after first 2 and any trailing commas
-            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(2)} ${serving.serving_description.split(' ')[1].replace(/,$/g, '')}`,
+            // Removes excess words/numbers after first 2 and any trailing commas
+            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(2)} ${serving.serving_description.split(' ')[1].replace(/,$/, '')}`,
             metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toString(),
             metric_serving_unit: serving.metric_serving_unit,
             calories: (parseFloat(serving.calories) * scaleFactor).toFixed(0),
@@ -274,14 +269,14 @@ const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) =>
                 Nutrition Facts
             </Text>
             <View className="border-b-2 border-black"></View>
-                <View className="flex-row justify-between mt-1 mb-1">
-                    <Text className="ml-1 flex-3 font-semibold text-xl">
-                        Serving Size
-                    </Text>
-                    <Text className="mr-1 flex-1 text-right font-semibold text-xl">
-                        {currServing.serving_description}
-                    </Text>
-                </View>
+            <View className="flex-row justify-between mt-1 mb-1">
+                <Text className="ml-1 flex-3 font-semibold text-xl">
+                    Serving Size
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-semibold text-xl">
+                    {currServing.serving_description}
+                </Text>
+            </View>
             <View className="border-b-8 border-black"></View>
         </View>
     );
@@ -291,8 +286,6 @@ export default Nutrition;
 
 
 /* 
-
-Fix 1/2 not be displayed as 0.5
 
     <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
         <Text className="text-4xl text-left font-bold mb-1">Nutrition Facts</Text>

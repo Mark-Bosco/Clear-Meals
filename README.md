@@ -40,3 +40,4 @@
 
 ### Future:
 - Save user's daily logs to cloud and sync when logged in
+- Implement premium FatSecret API
