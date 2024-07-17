@@ -65,8 +65,8 @@ const Nutrition: React.FC = () => {
         }
 
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
-        const hasOz = newServings.some(s => s.serving_description.split(' ')[1]?.replace(/,$/g, '') === 'oz');
-        const hasGram = newServings.some(s => s.serving_description.split(' ')[1]?.replace(/,$/g, '') === 'g');
+        const hasOz = newServings.some(s => s.serving_description.split(' ')[1] === 'oz');
+        const hasGram = newServings.some(s => s.serving_description.split(' ')[1] === 'g');
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
             if (!hasOz) {
@@ -109,11 +109,8 @@ const Nutrition: React.FC = () => {
                 const servings = await getFood(foodId);
                 let updatedServings = addMetricServings(servings.food);
                 setFood(updatedServings);
-                // Set the default serving index to the first serving in the list
-                // Thought this should trigger the useEffect to update the currServing state???
                 setServingIndex(0);
-                // Set the default serving to the first serving in the list
-                setCurrServing(updatedServings.servings.serving[0]);
+                setReset(true);
             } catch (err) {
                 console.error(err);
             }
@@ -132,7 +129,8 @@ const Nutrition: React.FC = () => {
 
         const currServing: Serving = {
             measurement_description: serving.measurement_description,
-            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(2)} ${serving.serving_description.split(' ')[1]}`,
+            // Removes excess words after first 2 and any trailing commas
+            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(2)} ${serving.serving_description.split(' ')[1].replace(/,$/g, '')}`,
             metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toString(),
             metric_serving_unit: serving.metric_serving_unit,
             calories: (parseFloat(serving.calories) * scaleFactor).toFixed(0),
@@ -203,7 +201,7 @@ const Nutrition: React.FC = () => {
         );
     }
 
-    const unit = food.servings.serving[servingIndex].serving_description.split(' ')[1]?.replace(/,$/g, '');
+    const unit = food.servings.serving[servingIndex].serving_description.split(' ')[1];
 
     return (
         <SafeAreaView className="flex-1 bg-white mt-10 p-4">
@@ -229,7 +227,7 @@ const Nutrition: React.FC = () => {
                             className={`mr-2 p-3 border border-gray-300 rounded ${servingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
                             onPress={() => setServingIndex(index)}
                         >
-                            <Text className='text-2xl font-bold text-white'>{`${serving.serving_description.replace(/^\d+.\d+|\d+\s*/, '').replace(/,$/g, '')}`}</Text>
+                            <Text className='text-2xl font-bold text-white'>{`${serving.serving_description.replace(/^\d+.\d+|\d+\s*/, '')}`}</Text>
                         </Pressable>
                     ))}
                 </ScrollView>
@@ -271,8 +269,20 @@ const Nutrition: React.FC = () => {
 const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) => {
 
     return (
-        <View className='border border-black p-4 mb-5 bg-gray-100 rounded-md'>
-            
+        <View className="border-2 border-black p-3 mb-4 bg-gray-100">
+            <Text className="ml-1 text-3xl text-left font-extrabold">
+                Nutrition Facts
+            </Text>
+            <View className="border-b-2 border-black"></View>
+                <View className="flex-row justify-between mt-1 mb-1">
+                    <Text className="ml-1 flex-3 font-semibold text-xl">
+                        Serving Size
+                    </Text>
+                    <Text className="mr-1 flex-1 text-right font-semibold text-xl">
+                        {currServing.serving_description}
+                    </Text>
+                </View>
+            <View className="border-b-8 border-black"></View>
         </View>
     );
 };
