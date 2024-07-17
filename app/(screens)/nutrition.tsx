@@ -268,60 +268,68 @@ const Nutrition: React.FC = () => {
     );
 };
 
-const NutritionRow: React.FC<{
-    label: string;
-    value: string | undefined | number;
-    unit: string;
-    indent?: boolean;
-    bold?: boolean;
-    largerFont?: boolean;
-}> = ({ label, value, unit, indent, bold = false, largerFont = false }) => (
-    <View className={`flex-row justify-between my-0.5 ${indent ? 'pl-5' : ''}`}>
-        <Text className={`flex-3 ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
-            {label}
-        </Text>
-        <Text className={`flex-1 text-right ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
-            {value} {unit}
-        </Text>
-    </View>
-);
-
 const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) => {
 
-    const formattedMetricServing = `(${(currServing.metric_serving_amount, 0)} ${currServing.metric_serving_unit})`;
-    const isMetricServing = currServing.measurement_description === currServing.metric_serving_unit;
-
     return (
-        <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
-            <Text className="text-4xl text-left font-bold mb-1">Nutrition Facts</Text>
-            <View className="border-b border-black my-1" />
-            <NutritionRow
-                label="Serving Size"
-                value={`${currServing.serving_description.split(' ')[0] || ''} ${currServing.serving_description.split(' ')[1]?.replace(/,$/g, '')}`}
-                unit={isMetricServing ? "" : formattedMetricServing}
-                bold={true}
-            />
-            <View className="border-b border-black my-1" />
-            <NutritionRow label="Calories" value={currServing.calories} unit="" bold={true} largerFont={true} />
-            <View className="border-b border-black my-1" />
-            <NutritionRow label="Total Fat" value={(currServing.fat)} unit="g" bold={true} />
-            <NutritionRow label="  Saturated Fat" value={(currServing.saturated_fat)} unit="g" indent />
-            <NutritionRow label="  Trans Fat" value="0" unit="g" indent />
-            <NutritionRow label="Cholesterol" value={(currServing.cholesterol, 0)} unit="mg" bold={true} />
-            <NutritionRow label="Sodium" value={(currServing.sodium, 0)} unit="mg" bold={true} />
-            <NutritionRow label="Total Carbohydrate" value={(currServing.carbohydrate)} unit="g" bold={true} />
-            <NutritionRow label="  Dietary Fiber" value={(currServing.fiber)} unit="g" indent />
-            <NutritionRow label="  Sugars" value={(currServing.sugar)} unit="g" indent />
-            <NutritionRow label="Protein" value={(currServing.protein)} unit="g" bold={true} />
-            <View className="border-b border-black my-1" />
-            <NutritionRow label="Vitamin A" value={(currServing.vitamin_a, 0)} unit="mcg" />
-            <NutritionRow label="Vitamin C" value={(currServing.vitamin_c)} unit="mg" />
-            <NutritionRow label="Calcium" value={(currServing.calcium, 0)} unit="mg" />
-            <NutritionRow label="Iron" value={(currServing.iron)} unit="mg" />
-            <View className="border-b border-black my-1" />
-            <Text className="text-sm text-gray-500">Provided by FatSecret</Text>
+        <View className='border border-black p-4 mb-5 bg-gray-100 rounded-md'>
+            
         </View>
     );
 };
 
 export default Nutrition;
+
+
+/* 
+
+Fix 1/2 not be displayed as 0.5
+
+    <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
+        <Text className="text-4xl text-left font-bold mb-1">Nutrition Facts</Text>
+        <View className="border-b border-black my-1" />
+        <NutritionRow
+            label="Serving Size"
+            value={`${currServing.serving_description.split(' ')[0] || ''} ${currServing.serving_description.split(' ')[1]?.replace(/,$/g, '')}`}
+            unit={isMetricServing ? "" : formattedMetricServing}
+            bold={true}
+        />
+        <View className="border-b border-black my-1" />
+        <NutritionRow label="Calories" value={currServing.calories} unit="" bold={true} largerFont={true} />
+        <View className="border-b border-black my-1" />
+        <NutritionRow label="Total Fat" value={(currServing.fat)} unit="g" bold={true} />
+        <NutritionRow label="  Saturated Fat" value={(currServing.saturated_fat)} unit="g" indent />
+        <NutritionRow label="  Trans Fat" value="0" unit="g" indent />
+        <NutritionRow label="Cholesterol" value={(currServing.cholesterol, 0)} unit="mg" bold={true} />
+        <NutritionRow label="Sodium" value={(currServing.sodium, 0)} unit="mg" bold={true} />
+        <NutritionRow label="Total Carbohydrate" value={(currServing.carbohydrate)} unit="g" bold={true} />
+        <NutritionRow label="  Dietary Fiber" value={(currServing.fiber)} unit="g" indent />
+        <NutritionRow label="  Sugars" value={(currServing.sugar)} unit="g" indent />
+        <NutritionRow label="Protein" value={(currServing.protein)} unit="g" bold={true} />
+        <View className="border-b border-black my-1" />
+        <NutritionRow label="Vitamin A" value={(currServing.vitamin_a, 0)} unit="mcg" />
+        <NutritionRow label="Vitamin C" value={(currServing.vitamin_c)} unit="mg" />
+        <NutritionRow label="Calcium" value={(currServing.calcium, 0)} unit="mg" />
+        <NutritionRow label="Iron" value={(currServing.iron)} unit="mg" />
+        <View className="border-b border-black my-1" />
+        <Text className="text-sm text-gray-500">Provided by FatSecret</Text>
+    </View>
+
+    const NutritionRow: React.FC<{
+        label: string;
+        value: string | undefined | number;
+        unit: string;
+        indent?: boolean;
+        bold?: boolean;
+        largerFont?: boolean;
+    }> = ({ label, value, unit, indent, bold = false, largerFont = false }) => (
+        <View className={`flex-row justify-between my-0.5 ${indent ? 'pl-5' : ''}`}>
+            <Text className={`flex-3 ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
+                {label}
+            </Text>
+            <Text className={`flex-1 text-right ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
+                {value} {unit}
+            </Text>
+        </View>
+    );
+
+*/
