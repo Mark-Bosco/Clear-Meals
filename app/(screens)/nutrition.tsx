@@ -64,9 +64,10 @@ const Nutrition: React.FC = () => {
             throw new Error('Missing metric serving unit for food item');
         }
 
+        const hasOz = newServings.some(s => s.serving_description.split(' ')[1] === 'oz');
+        const hasGram = newServings.some(s => s.serving_description.split(' ')[1] === 'g');
+        
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
-        const hasOz = newServings.some(s => s.unit === 'oz');
-        const hasGram = newServings.some(s => s.unit === 'g');
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
             if (!hasOz) {
@@ -267,7 +268,6 @@ const Nutrition: React.FC = () => {
 };
 
 const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) => {
-
     return (
         <View className="border-2 border-black p-3 mb-4 bg-gray-100">
             <Text className="ml-1 text-3xl text-left font-extrabold">
