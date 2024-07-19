@@ -19,8 +19,8 @@ interface Serving {
     metric_serving_amount: string;
     metric_serving_unit: string;
     serving_description: string;
-    serving_amount : string;
-    serving_unit: string;
+    amount: string;
+    unit: string;
     calories: string;
     fat?: string;
     saturated_fat?: string;
@@ -65,8 +65,8 @@ const Nutrition: React.FC = () => {
         }
 
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
-        const hasOz = newServings.some(s => s.serving_unit === 'oz');
-        const hasGram = newServings.some(s => s.serving_unit === 'g');
+        const hasOz = newServings.some(s => s.unit === 'oz');
+        const hasGram = newServings.some(s => s.unit === 'g');
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
             if (!hasOz) {
@@ -75,8 +75,8 @@ const Nutrition: React.FC = () => {
                 const ozServing: Serving = {
                     ...firstServing,
                     serving_description: `${ozAmount.toFixed(1)} oz`,
-                    serving_amount: ozAmount.toFixed(1),
-                    serving_unit: 'oz',
+                    amount: ozAmount.toFixed(1),
+                    unit: 'oz',
                     metric_serving_amount: ozAmount.toString(),
                     metric_serving_unit: 'oz'
                 };
@@ -88,8 +88,8 @@ const Nutrition: React.FC = () => {
                 const gServing: Serving = {
                     ...firstServing,
                     serving_description: `${gAmount.toFixed(0)} g`,
-                    serving_amount: gAmount.toFixed(0),
-                    serving_unit: 'g',
+                    amount: gAmount.toFixed(0),
+                    unit: 'g',
                     metric_serving_amount: gAmount.toString(),
                     metric_serving_unit: 'g'
                 };
@@ -130,26 +130,25 @@ const Nutrition: React.FC = () => {
         const scaleFactor = rawScaleFactor / base
 
         const currServing: Serving = {
-            // Removes excess words/numbers after first 2 and any trailing commas
-            serving_amount: (parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1),
-            serving_unit: serving.serving_description.split(' ')[1].replace(/,$/, ''),
-            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1)} ${serving.serving_description.split(' ')[1].replace(/,$/, '')}`,
+            serving_description: serving.serving_description,
+            amount: (parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1),
+            unit: serving.serving_description.split(' ')[1].replace(/,$/, ''),
             metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toFixed(1),
             metric_serving_unit: serving.metric_serving_unit,
             calories: (parseFloat(serving.calories) * scaleFactor).toFixed(0),
-            fat: (parseFloat(serving.fat ?? '0') * scaleFactor).toFixed(1),
-            carbohydrate: (parseFloat(serving.carbohydrate ?? '0') * scaleFactor).toFixed(1),
-            protein: (parseFloat(serving.protein ?? '0') * scaleFactor).toFixed(1),
-            saturated_fat: (parseFloat(serving.saturated_fat ?? '0') * scaleFactor).toFixed(1),
-            trans_fat: (parseFloat(serving.trans_fat ?? '0') * scaleFactor).toFixed(1),
-            cholesterol: (parseFloat(serving.cholesterol ?? '0') * scaleFactor).toFixed(1),
-            sodium: (parseFloat(serving.sodium ?? '0') * scaleFactor).toFixed(1),
-            fiber: (parseFloat(serving.fiber ?? '0') * scaleFactor).toFixed(1),
-            sugar: (parseFloat(serving.sugar ?? '0') * scaleFactor).toFixed(1),
-            vitamin_a: (parseFloat(serving.vitamin_a ?? '0') * scaleFactor).toFixed(1),
-            vitamin_c: (parseFloat(serving.vitamin_c ?? '0') * scaleFactor).toFixed(1),
-            iron: (parseFloat(serving.iron ?? '0') * scaleFactor).toFixed(1),
-            calcium: (parseFloat(serving.calcium ?? '0') * scaleFactor).toFixed(1),
+            fat: serving.fat ? (parseFloat(serving.fat) * scaleFactor).toFixed(0) : 'N/A',
+            carbohydrate: serving.carbohydrate ? (parseFloat(serving.carbohydrate) * scaleFactor).toFixed(0) : 'N/A',
+            protein: serving.protein ? (parseFloat(serving.protein) * scaleFactor).toFixed(0) : 'N/A',
+            saturated_fat: serving.saturated_fat ? (parseFloat(serving.saturated_fat) * scaleFactor).toFixed(0) : 'N/A',
+            trans_fat: serving.trans_fat ? (parseFloat(serving.trans_fat) * scaleFactor).toFixed(0) : 'N/A',
+            cholesterol: serving.cholesterol ? (parseFloat(serving.cholesterol) * scaleFactor).toFixed(0) : 'N/A',
+            sodium: serving.sodium ? (parseFloat(serving.sodium) * scaleFactor).toFixed(0) : 'N/A',
+            fiber: serving.fiber ? (parseFloat(serving.fiber) * scaleFactor).toFixed(0) : 'N/A',
+            sugar: serving.sugar ? (parseFloat(serving.sugar) * scaleFactor).toFixed(0) : 'N/A',
+            vitamin_a: serving.vitamin_a ? (parseFloat(serving.vitamin_a) * scaleFactor).toFixed(0) : 'N/A',
+            vitamin_c: serving.vitamin_c ? (parseFloat(serving.vitamin_c) * scaleFactor).toFixed(0) : 'N/A',
+            iron: serving.iron ? (parseFloat(serving.iron) * scaleFactor).toFixed(0) : 'N/A',
+            calcium: serving.calcium ? (parseFloat(serving.calcium) * scaleFactor).toFixed(0) : 'N/A',
         }
         setCurrServing(currServing);
     }
@@ -165,7 +164,6 @@ const Nutrition: React.FC = () => {
             const currCals = parseFloat(currServing?.calories || '0');
             loadServing(servingIndex, currCals, true);
         } else {
-            // Using food structure
             const baseAmount = parseFloat(food?.servings.serving[servingIndex].serving_description.split(' ')[0] || '0');
             loadServing(servingIndex, baseAmount, false);
         }
@@ -241,11 +239,11 @@ const Nutrition: React.FC = () => {
                         <TextInput
                             className="bg-white text-2xl rounded px-2 py-1"
                             keyboardType="numeric"
-                            defaultValue={currServing.serving_amount}
+                            defaultValue={currServing.amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
                                 handleServingSizeChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-2xl text-white font-bold">{currServing.serving_unit}</Text>
+                        <Text className="ml-2 text-2xl text-white font-bold">{currServing.unit}</Text>
                     </View>
                     <View className="ml-10 flex-row items-center">
                         <TextInput
@@ -281,72 +279,142 @@ const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) =>
                     Serving Size
                 </Text>
                 <Text className="mr-1 flex-1 text-right font-semibold text-xl">
-                    {currServing.serving_amount} {currServing.serving_unit}
+                    {currServing.amount} {currServing.unit}
                 </Text>
                 <Text className="mr-1 text-right font-semibold text-xl">
-                    {currServing.serving_unit === "g" 
-                    || currServing.serving_unit === "oz" 
-                    ? "" 
-                    : `(${currServing.metric_serving_amount} ${currServing.metric_serving_unit})`}
+                    {currServing.unit === "g" || currServing.unit === "oz" ? ""
+                        : `(${currServing.metric_serving_amount}${currServing.metric_serving_unit})`}
                 </Text>
-
             </View>
             <View className="border-b-8 border-black"></View>
+            <View className="flex-row justify-between mt-2 mb-1">
+                <Text className="ml-1 flex-3 font-extrabold text-3xl">
+                    Calories
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-3xl">
+                    {currServing.calories}
+                </Text>
+            </View>
+            <View className="border-b-4 border-black"></View>
+            <View className="flex-row justify-between mt-1">
+                <Text className="ml-1 flex-3 font-extrabold text-lg">
+                    Total Fat
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
+                    {currServing.fat == "N/A" ? "N/A" : `${currServing.fat}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-8 flex-3 text-lg">
+                    Saturated Fat
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.saturated_fat == "N/A" ? "N/A" : `${currServing.saturated_fat}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-8 flex-3 text-lg">
+                    Trans Fat
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.trans_fat == "N/A" ? "N/A" : `${currServing.trans_fat}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 font-extrabold text-lg">
+                    Cholesterol
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
+                    {currServing.cholesterol == "N/A" ? "N/A" : `${currServing.cholesterol}mg`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 font-extrabold text-lg">
+                    Sodium
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
+                    {currServing.sodium == "N/A" ? "N/A" : `${currServing.sodium}mg`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 font-extrabold text-lg">
+                    Total Carbohydrate
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
+                    {currServing.carbohydrate == "N/A" ? "N/A" : `${currServing.carbohydrate}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-8 flex-3 text-lg">
+                    Dietary Fiber
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.fiber == "N/A" ? "N/A" : `${currServing.fiber}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-8 flex-3 text-lg">
+                    Total Sugars
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.sugar == "N/A" ? "N/A" : `${currServing.sugar}g`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 font-extrabold text-lg">
+                    Protein
+                </Text>
+                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
+                    {currServing.protein == "N/A" ? "N/A" : `${currServing.protein}g`}
+                </Text>
+            </View>
+            <View className="border-b-8 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 text-lg">
+                    Vitamin A
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.vitamin_a == "N/A" ? "N/A" : `${currServing.vitamin_a}mcg`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 text-lg">
+                    Vitamin C
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.vitamin_c == "N/A" ? "N/A" : `${currServing.vitamin_c}mg`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 text-lg">
+                    Calcium
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.calcium == "N/A" ? "N/A" : `${currServing.calcium}mg`}
+                </Text>
+            </View>
+            <View className="border-b-2 border-black"></View>
+            <View className="flex-row justify-between">
+                <Text className="ml-1 flex-3 text-lg">
+                    Iron
+                </Text>
+                <Text className="mr-1 flex-1 text-right text-xl">
+                    {currServing.iron == "N/A" ? "N/A" : `${currServing.iron}mg`}
+                </Text>
+            </View>
+            <View className="border-b-4 border-black"></View>
         </View>
     );
 };
 
 export default Nutrition;
-
-
-/* 
-
-    <View className="border border-black p-4 mb-5 bg-gray-100 rounded-md">
-        <Text className="text-4xl text-left font-bold mb-1">Nutrition Facts</Text>
-        <View className="border-b border-black my-1" />
-        <NutritionRow
-            label="Serving Size"
-            value={`${currServing.serving_description.split(' ')[0] || ''} ${currServing.serving_description.split(' ')[1]?.replace(/,$/g, '')}`}
-            unit={isMetricServing ? "" : formattedMetricServing}
-            bold={true}
-        />
-        <View className="border-b border-black my-1" />
-        <NutritionRow label="Calories" value={currServing.calories} unit="" bold={true} largerFont={true} />
-        <View className="border-b border-black my-1" />
-        <NutritionRow label="Total Fat" value={(currServing.fat)} unit="g" bold={true} />
-        <NutritionRow label="  Saturated Fat" value={(currServing.saturated_fat)} unit="g" indent />
-        <NutritionRow label="  Trans Fat" value="0" unit="g" indent />
-        <NutritionRow label="Cholesterol" value={(currServing.cholesterol, 0)} unit="mg" bold={true} />
-        <NutritionRow label="Sodium" value={(currServing.sodium, 0)} unit="mg" bold={true} />
-        <NutritionRow label="Total Carbohydrate" value={(currServing.carbohydrate)} unit="g" bold={true} />
-        <NutritionRow label="  Dietary Fiber" value={(currServing.fiber)} unit="g" indent />
-        <NutritionRow label="  Sugars" value={(currServing.sugar)} unit="g" indent />
-        <NutritionRow label="Protein" value={(currServing.protein)} unit="g" bold={true} />
-        <View className="border-b border-black my-1" />
-        <NutritionRow label="Vitamin A" value={(currServing.vitamin_a, 0)} unit="mcg" />
-        <NutritionRow label="Vitamin C" value={(currServing.vitamin_c)} unit="mg" />
-        <NutritionRow label="Calcium" value={(currServing.calcium, 0)} unit="mg" />
-        <NutritionRow label="Iron" value={(currServing.iron)} unit="mg" />
-        <View className="border-b border-black my-1" />
-        <Text className="text-sm text-gray-500">Provided by FatSecret</Text>
-    </View>
-
-    const NutritionRow: React.FC<{
-        label: string;
-        value: string | undefined | number;
-        unit: string;
-        indent?: boolean;
-        bold?: boolean;
-        largerFont?: boolean;
-    }> = ({ label, value, unit, indent, bold = false, largerFont = false }) => (
-        <View className={`flex-row justify-between my-0.5 ${indent ? 'pl-5' : ''}`}>
-            <Text className={`flex-3 ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
-                {label}
-            </Text>
-            <Text className={`flex-1 text-right ${bold ? 'font-bold' : ''} ${largerFont ? 'text-2xl' : ''}`}>
-                {value} {unit}
-            </Text>
-        </View>
-    );
-
-*/
