@@ -19,6 +19,8 @@ interface Serving {
     metric_serving_amount: string;
     metric_serving_unit: string;
     serving_description: string;
+    serving_amount : string;
+    serving_unit: string;
     calories: string;
     fat?: string;
     saturated_fat?: string;
@@ -63,8 +65,8 @@ const Nutrition: React.FC = () => {
         }
 
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
-        const hasOz = newServings.some(s => s.serving_description.split(' ')[1] === 'oz');
-        const hasGram = newServings.some(s => s.serving_description.split(' ')[1] === 'g');
+        const hasOz = newServings.some(s => s.serving_unit === 'oz');
+        const hasGram = newServings.some(s => s.serving_unit === 'g');
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
             if (!hasOz) {
@@ -72,7 +74,9 @@ const Nutrition: React.FC = () => {
                 const ozAmount = metricUnit === 'oz' ? metricAmount : gramsToOz(metricAmount);
                 const ozServing: Serving = {
                     ...firstServing,
-                    serving_description: `${ozAmount.toFixed(2)} oz`,
+                    serving_description: `${ozAmount.toFixed(1)} oz`,
+                    serving_amount: ozAmount.toFixed(1),
+                    serving_unit: 'oz',
                     metric_serving_amount: ozAmount.toString(),
                     metric_serving_unit: 'oz'
                 };
@@ -84,6 +88,8 @@ const Nutrition: React.FC = () => {
                 const gServing: Serving = {
                     ...firstServing,
                     serving_description: `${gAmount.toFixed(0)} g`,
+                    serving_amount: gAmount.toFixed(0),
+                    serving_unit: 'g',
                     metric_serving_amount: gAmount.toString(),
                     metric_serving_unit: 'g'
                 };
@@ -125,8 +131,10 @@ const Nutrition: React.FC = () => {
 
         const currServing: Serving = {
             // Removes excess words/numbers after first 2 and any trailing commas
-            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(2)} ${serving.serving_description.split(' ')[1].replace(/,$/, '')}`,
-            metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toString(),
+            serving_amount: (parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1),
+            serving_unit: serving.serving_description.split(' ')[1].replace(/,$/, ''),
+            serving_description: `${(parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1)} ${serving.serving_description.split(' ')[1].replace(/,$/, '')}`,
+            metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toFixed(1),
             metric_serving_unit: serving.metric_serving_unit,
             calories: (parseFloat(serving.calories) * scaleFactor).toFixed(0),
             fat: (parseFloat(serving.fat ?? '0') * scaleFactor).toFixed(1),
@@ -157,6 +165,7 @@ const Nutrition: React.FC = () => {
             const currCals = parseFloat(currServing?.calories || '0');
             loadServing(servingIndex, currCals, true);
         } else {
+            // Using food structure
             const baseAmount = parseFloat(food?.servings.serving[servingIndex].serving_description.split(' ')[0] || '0');
             loadServing(servingIndex, baseAmount, false);
         }
@@ -196,8 +205,6 @@ const Nutrition: React.FC = () => {
         );
     }
 
-    const unit = food.servings.serving[servingIndex].serving_description.split(' ')[1];
-
     return (
         <SafeAreaView className="flex-1 bg-white mt-10 p-4">
             <ScrollView>
@@ -234,11 +241,11 @@ const Nutrition: React.FC = () => {
                         <TextInput
                             className="bg-white text-2xl rounded px-2 py-1"
                             keyboardType="numeric"
-                            defaultValue={currServing.serving_description.split(' ')[0]}
+                            defaultValue={currServing.serving_amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
                                 handleServingSizeChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-2xl text-white font-bold">{unit}</Text>
+                        <Text className="ml-2 text-2xl text-white font-bold">{currServing.serving_unit}</Text>
                     </View>
                     <View className="ml-10 flex-row items-center">
                         <TextInput
@@ -274,8 +281,15 @@ const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) =>
                     Serving Size
                 </Text>
                 <Text className="mr-1 flex-1 text-right font-semibold text-xl">
-                    {currServing.serving_description}
+                    {currServing.serving_amount} {currServing.serving_unit}
                 </Text>
+                <Text className="mr-1 text-right font-semibold text-xl">
+                    {currServing.serving_unit === "g" 
+                    || currServing.serving_unit === "oz" 
+                    ? "" 
+                    : `(${currServing.metric_serving_amount} ${currServing.metric_serving_unit})`}
+                </Text>
+
             </View>
             <View className="border-b-8 border-black"></View>
         </View>
