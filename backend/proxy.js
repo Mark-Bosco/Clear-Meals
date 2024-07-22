@@ -51,7 +51,7 @@ proxy.post('/user-token', async (req, res) => {
         },
         data: querystring.stringify({
           grant_type: 'client_credentials',
-          scope: 'basic'
+          scope: 'premier'
         })
       });
 
@@ -93,7 +93,7 @@ proxy.post('/general-token', async (req, res) => {
         },
         data: querystring.stringify({
           grant_type: 'client_credentials',
-          scope: 'basic'
+          scope: 'premier'
         })
       });
 

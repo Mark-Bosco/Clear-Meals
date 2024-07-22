@@ -19,15 +19,14 @@
 - Move proxy server to cloud
 
 ### Search:
-- Search suggestions (Hold off until I know if I can get premier access)
-- Added food list on search screen
-- Implement local storage to add a selected food to a meal and update the daily log
+- Search suggestions
+- Load search food list into cloud storage
 - Screen for no results
-- Make generic food load first?
+- Editable search food list items
 
 ### Nutrition Screen:
 - Add a swipe feature to increment serving size by its default value
-- Export food data
+- IMPORTANT: The only storable values are food_id and serving_id
 
 ### Home:
 - Load the daily log to display it on the home screen
@@ -41,3 +40,8 @@
 ### Future:
 - Save user's daily logs to cloud and sync when logged in
 - Implement premium FatSecret API
+
+### Misc:
+- Had to update whitelisted IPs when internet went down?
+- Add FatSecret Attribution
+- ERROR  [Error: Missing metric serving unit for food item]

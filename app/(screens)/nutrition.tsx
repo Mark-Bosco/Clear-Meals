@@ -1,46 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
+import { Food, FoodListItem, Serving } from "../types";
+import { useFoodList } from '../FoodListContext';
 
 const ozToGrams = (oz: number) => oz * 28.34952;
 const gramsToOz = (g: number) => g / 28.34952;
-
-interface Food {
-    food_id: string;
-    food_name: string;
-    brand_name: string;
-    servings: {
-        serving: Serving[];
-    };
-}
-
-interface Serving {
-    metric_serving_amount: string;
-    metric_serving_unit: string;
-    serving_description: string;
-    amount: string;
-    unit: string;
-    calories: string;
-    fat?: string;
-    saturated_fat?: string;
-    trans_fat?: string;
-    cholesterol?: string;
-    sodium?: string;
-    carbohydrate?: string;
-    fiber?: string;
-    sugar?: string;
-    protein?: string;
-    vitamin_a?: string;
-    vitamin_c?: string;
-    calcium?: string;
-    iron?: string;
-}
 
 // Nutrition screen component
 const Nutrition: React.FC = () => {
     // Food ID from URL params
     const { foodId } = useLocalSearchParams<{ foodId: string }>();
+    // Calorie override used for loading edited food list items
+    const { calorieOverride } = useLocalSearchParams<{ calorieOverride: string }>();
+    const { foodListIndex } = useLocalSearchParams<{ foodListIndex: string }>();
+    const [override, setOverride] = useState(false);
     // Collection of food servings
     const [food, setFood] = useState<Food | null>(null);
     // Index of currently displayed serving
@@ -51,6 +26,7 @@ const Nutrition: React.FC = () => {
     const [sync, setSync] = useState(false);
     // Reset the calorie and serving size inputs back to default
     const [reset, setReset] = useState(false);
+    const { addFood, replaceFood } = useFoodList();
 
     // Create default metric serving sizes, if they don't exist, for the selected food item
     const addMetricServings = (food: Food) => {
@@ -58,7 +34,17 @@ const Nutrition: React.FC = () => {
         let newServings = food.servings.serving.map(serving => ({ ...serving }));
 
         const firstServing = newServings[0];
-        const metricAmount = parseFloat(firstServing.metric_serving_amount);
+
+        // Bug fix for missing metric
+        let metricAmount;
+        if (firstServing.metric_serving_amount) {
+            metricAmount = parseFloat(firstServing.metric_serving_amount);
+        } else {
+            return {
+                ...food,
+                servings: { serving: newServings }
+            };
+        }
 
         if (!(firstServing.metric_serving_unit)) {
             throw new Error('Missing metric serving unit for food item');
@@ -66,7 +52,7 @@ const Nutrition: React.FC = () => {
 
         const hasOz = newServings.some(s => s.serving_description.split(' ')[1] === 'oz');
         const hasGram = newServings.some(s => s.serving_description.split(' ')[1] === 'g');
-        
+
         const metricUnit = firstServing.metric_serving_unit.toLowerCase();
 
         if (metricUnit === 'oz' || metricUnit === 'g') {
@@ -109,6 +95,8 @@ const Nutrition: React.FC = () => {
         const fetchData = async () => {
             if (!foodId) return;
             try {
+                if (calorieOverride)
+                    setOverride(true)
                 const servings = await getFood(foodId);
                 let updatedServings = addMetricServings(servings.food);
                 setFood(updatedServings);
@@ -120,7 +108,6 @@ const Nutrition: React.FC = () => {
         };
         fetchData();
     }, [foodId]);
-
 
     // Load a serving to display
     const loadServing = (index: number, rawScaleFactor: number, calorieChange: boolean) => {
@@ -134,8 +121,8 @@ const Nutrition: React.FC = () => {
             serving_description: serving.serving_description,
             amount: (parseFloat(serving.serving_description.split(' ')[0]) * scaleFactor).toFixed(1),
             unit: serving.serving_description.split(' ')[1].replace(/,$/, ''),
-            metric_serving_amount: (parseFloat(serving.metric_serving_amount) * scaleFactor).toFixed(1),
-            metric_serving_unit: serving.metric_serving_unit,
+            metric_serving_amount: serving.metric_serving_amount ? (parseFloat(serving.metric_serving_amount) * scaleFactor).toFixed(1) : 'N/A',
+            metric_serving_unit: serving.metric_serving_unit || 'N/A',
             calories: (parseFloat(serving.calories) * scaleFactor).toFixed(0),
             fat: serving.fat ? (parseFloat(serving.fat) * scaleFactor).toFixed(0) : 'N/A',
             carbohydrate: serving.carbohydrate ? (parseFloat(serving.carbohydrate) * scaleFactor).toFixed(0) : 'N/A',
@@ -157,9 +144,16 @@ const Nutrition: React.FC = () => {
     // Update when selected serving type changes or reset
     useEffect(() => {
         if (reset) {
-            loadServing(servingIndex, 1, false);
+            // Apply calorie override if editing a list item
+            if (calorieOverride && override) {
+                loadServing(servingIndex, parseInt(calorieOverride), true);
+                setOverride(false)
+                setSync(true);
+            } else {
+                loadServing(servingIndex, 1, false);
+                setSync(false);
+            }
             setReset(false);
-            setSync(false);
         } else if (sync) {
             // Keep the current scaling when switching serving types
             const currCals = parseFloat(currServing?.calories || '0');
@@ -195,6 +189,27 @@ const Nutrition: React.FC = () => {
         }
     };
 
+    const handleSave = () => {
+        if (food && currServing) {
+            const foodListItem: FoodListItem = {
+                food_id: food.food_id,
+                food_name: food.food_name,
+                brand_name: food.brand_name || "Generic",
+                calories: currServing.calories,
+            };
+
+            // Replace
+            if (foodListIndex) {
+                replaceFood(parseInt(foodListIndex), foodListItem)
+            } else {
+                addFood(foodListItem);
+            }
+        }
+
+        router.back();
+    };
+
+
     // Early return if food or currServing is null
     if (!food || !currServing) {
         return (
@@ -214,7 +229,7 @@ const Nutrition: React.FC = () => {
                 />
             </ScrollView>
             <View>
-                <View className='flex-row justify-between mt-2'>
+                <View className='flex-row justify-between mt-4'>
                     <Text className='text-3xl font-bold py-1'>Serving Type:</Text>
                     <Pressable className="bg-gray-500 rounded px-4 justify-center active:bg-gray-600" onPress={() => setReset(true)}>
                         <Text className="text-white text-xl font-bold">Reset</Text>
@@ -257,7 +272,7 @@ const Nutrition: React.FC = () => {
                         <Text className="ml-2 text-2xl text-white font-bold">cal</Text>
                     </View>
                     <View className="ml-10 flex-row items-center bg-white rounded px-4 py-1">
-                        <Pressable onPress={() => console.log("Temp")}>
+                        <Pressable onPress={handleSave}>
                             <Text className="text-2xl font-bold">Save</Text>
                         </Pressable>
                     </View>

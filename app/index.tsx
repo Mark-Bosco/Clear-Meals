@@ -4,6 +4,7 @@ import { useAuth } from './(auth)/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text } from 'react-native';
+import React from 'react';
 
 export default function Index() {
   const router = useRouter();

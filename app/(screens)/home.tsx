@@ -129,7 +129,7 @@ const Home = () => {
       {/* Meal Menu */}
       {visibleMenus.mealMenu && (
         <View className="flex col bg-green-700 p-2">
-          <Link href="/search" asChild>
+          <Link href={{ pathname: "/search", params: { mealType: "breakfast" } }} asChild>
             <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
               <Text className="text-4xl text-black font-bold">Breakfast</Text>
             </Pressable>
