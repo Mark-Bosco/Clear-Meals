@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
-import { Food, FoodListItem, MealType } from "../types";
+import { Food, MealType } from "../types";
 import { useFoodList } from '../FoodListContext';
 
 const getCalories = (food: Food): string => {
@@ -55,32 +55,12 @@ const Search = () => {
         router.back();
     };
 
-    const FoodListBubbles = () => (
-        <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
-            <ScrollView>
-                <View className="flex-row flex-wrap">
-                    {foodList.map((foodListItem, index) => (
-                        <Pressable key={index} onPress={() => router.push({
-                            pathname: '/(screens)/nutrition',
-                            params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodListIndex: index}
-                        })}
-                            className="bg-green-700 rounded-full px-3 py-1 m-1 flex-row items-center">
-                            <Text className="mr-2 text-white text-lg font-semibold">{foodListItem.food_name}</Text>
-                            <Text className="mr-2 text-white text-md">({foodListItem.calories} cals)</Text>
-                            <Pressable onPress={() => removeFood(index)}>
-                                <Text className="text-red-700 text-xl font-bold">×</Text>
-                            </Pressable>
-                        </Pressable>
-                    ))}
-                </View>
-            </ScrollView>
-        </View>
-    );
-
+    // Is reset results ever used?
     const handleSearch = useCallback(async (resetResults: boolean = true) => {
         if (loading || (resetResults && query.trim() === "")) return;
 
         setLoading(true);
+        // Clear suggestions on search entered
         setSuggestions([]);
 
         try {
@@ -104,7 +84,7 @@ const Search = () => {
             const foods = results.foods_search.results.food;
 
             setSearchResults(prevResults => resetResults ? foods : [...prevResults, ...foods]);
-            // Why are we using 2 page variables?
+            // Do we need 2 page variables?
             setPage(currentPage + 1);
             setHasMore((results.foods_search.max_results * page) < results.foods_search.total_results)
 
@@ -123,27 +103,6 @@ const Search = () => {
             handleSearch(false);
         }
     }, [hasMore, loading, handleSearch]);
-
-    const renderFoodItem = useCallback(({ item }: { item: Food }) => (
-        <FoodResult
-            food={item}
-            onPress={() => router.push({
-                pathname: '/(screens)/nutrition',
-                params: { foodId: item.food_id }
-            })}
-        />
-    ), []);
-
-    const keyExtractor = useCallback((food: Food) => food.food_id, []);
-
-    const renderFooter = useMemo(() => {
-        if (!loading) return null;
-        return (
-            <View className="py-4">
-                <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-        );
-    }, [loading]);
 
     const handleInputChange = useCallback(async (text: string) => {
         setQuery(text);
@@ -166,6 +125,28 @@ const Search = () => {
         handleSearch();
     }, [handleSearch]);
 
+    const renderFoodListBubbles = () => (
+        <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
+            <ScrollView>
+                <View className="flex-row flex-wrap">
+                    {foodList.map((foodListItem, index) => (
+                        <Pressable key={index} onPress={() => router.push({
+                            pathname: '/(screens)/nutrition',
+                            params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodListIndex: index }
+                        })}
+                            className="bg-green-700 rounded-full px-3 py-1 m-1 flex-row items-center">
+                            <Text className="mr-2 text-white text-lg font-semibold">{foodListItem.food_name}</Text>
+                            <Text className="mr-2 text-white text-md">({foodListItem.calories} cals)</Text>
+                            <Pressable onPress={() => removeFood(index)}>
+                                <Text className="text-red-700 text-xl font-bold">×</Text>
+                            </Pressable>
+                        </Pressable>
+                    ))}
+                </View>
+            </ScrollView>
+        </View>
+    );
+
     const renderSuggestions = () => (
         <View className="bg-white border border-gray-200 rounded-xl mx-4">
             {suggestions.map((suggestion, index) => (
@@ -179,10 +160,31 @@ const Search = () => {
             ))}
         </View>
     );
+    
+    const renderFoodItem = useCallback(({ item }: { item: Food }) => (
+        <FoodResult
+            food={item}
+            onPress={() => router.push({
+                pathname: '/(screens)/nutrition',
+                params: { foodId: item.food_id }
+            })}
+        />
+    ), []);
+
+    const renderFooter = useMemo(() => {
+        if (!loading) return null;
+        return (
+            <View className="py-4">
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }, [loading]);
+
+    const keyExtractor = useCallback((food: Food) => food.food_id, []);
 
     return (
         <View className="flex-1 bg-white mt-12">
-            {foodList.length > 0 && <FoodListBubbles />}
+            {foodList.length > 0 && renderFoodListBubbles()}
             <View className="px-4 mt-2">
                 <TextInput
                     className="my-1 bg-gray-200 rounded-xl p-2 px-4"
