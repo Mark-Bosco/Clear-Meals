@@ -87,4 +87,32 @@ const getFood = async (foodId: string) => {
   }
 };
 
-export { searchFood, getFood };
+const getAutocompleteSearch = async (expression: string) => {
+  const accessToken = await getAccessToken();
+
+  try {
+    const response = await axios.post(
+      'https://platform.fatsecret.com/rest/server.api',
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        params: {
+          method: 'foods.autocomplete.v2',
+          expression: expression,
+          format: 'json',
+          max_results: 6,
+        }
+      }
+    );
+      return response.data.suggestions.suggestion;
+  } catch (error) {
+    //console.error('Error getting autocomplete suggestions', error);
+    return[];
+  }
+};
+
+
+export { searchFood, getFood, getAutocompleteSearch };

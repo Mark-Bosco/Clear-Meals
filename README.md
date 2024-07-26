@@ -22,7 +22,6 @@
 - Search suggestions
 - Load search food list into cloud storage
 - Screen for no results
-- Editable search food list items
 
 ### Nutrition Screen:
 - Add a swipe feature to increment serving size by its default value
@@ -39,9 +38,9 @@
 
 ### Future:
 - Save user's daily logs to cloud and sync when logged in
-- Implement premium FatSecret API
 
 ### Misc:
 - Had to update whitelisted IPs when internet went down?
 - Add FatSecret Attribution
 - ERROR  [Error: Missing metric serving unit for food item]
+- Error getting autocomplete suggestions: [TypeError: Cannot read property 'suggestion' of null]

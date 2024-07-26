@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView } from "react-native";
-import { searchFood } from "../../backend/api";
+import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { Food, FoodListItem, MealType } from "../types";
 import { useFoodList } from '../FoodListContext';
@@ -48,13 +48,15 @@ const Search = () => {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
     const { foodList, removeFood, clearList } = useFoodList();
+    const [suggestions, setSuggestions] = useState<string[]>([]);
 
+    // TODO
     const handleListSave = () => {
         router.back();
     };
 
     const FoodListBubbles = () => (
-        <View className="bg-gray-100 p-4 mb-4" style={{ maxHeight: 100 }}>
+        <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
             <ScrollView>
                 <View className="flex-row flex-wrap">
                     {foodList.map((foodListItem, index) => (
@@ -79,6 +81,7 @@ const Search = () => {
         if (loading || (resetResults && query.trim() === "")) return;
 
         setLoading(true);
+        setSuggestions([]);
 
         try {
             const currentPage = resetResults ? 0 : page;
@@ -142,18 +145,54 @@ const Search = () => {
         );
     }, [loading]);
 
+    const handleInputChange = useCallback(async (text: string) => {
+        setQuery(text);
+        if (text.length >= 2) {
+            try {
+                const autocompleteSuggestions = await getAutocompleteSearch(text);
+                setSuggestions(autocompleteSuggestions);
+            } catch (error) {
+                console.error("Error getting autocomplete suggestions:", error);
+                setSuggestions([]);
+            }
+        } else {
+            setSuggestions([]);
+        }
+    }, []);
+
+    const handleSuggestionPress = useCallback((suggestion: string) => {
+        setQuery(suggestion);
+        setSuggestions([]);
+        handleSearch();
+    }, [handleSearch]);
+
+    const renderSuggestions = () => (
+        <View className="bg-white border border-gray-200 rounded-xl mx-4">
+            {suggestions.map((suggestion, index) => (
+                <Pressable
+                    key={index}
+                    className="p-2 border-b border-gray-200"
+                    onPress={() => handleSuggestionPress(suggestion)}
+                >
+                    <Text>{suggestion}</Text>
+                </Pressable>
+            ))}
+        </View>
+    );
+
     return (
-        <View className="flex-1 bg-white mt-10">
-            <View className="p-4">
+        <View className="flex-1 bg-white mt-12">
+            {foodList.length > 0 && <FoodListBubbles />}
+            <View className="px-4 mt-2">
                 <TextInput
                     className="my-1 bg-gray-200 rounded-xl p-2 px-4"
                     placeholder="Search for food..."
                     value={query}
-                    onChangeText={setQuery}
+                    onChangeText={handleInputChange}
                     onSubmitEditing={() => handleSearch()}
                 />
             </View>
-            {foodList.length > 0 && <FoodListBubbles />}
+            {suggestions.length > 0 && renderSuggestions()}
             <FlatList
                 data={searchResults}
                 renderItem={renderFoodItem}
