@@ -15,6 +15,7 @@ const FoodListContext = createContext<FoodListContextType | undefined>(undefined
 export const FoodListProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [foodList, setFoodList] = useState<FoodListItem[]>([]);
 
+  // Merge same foods
   const addFood = (food: FoodListItem) => {
     setFoodList((prevList) => [...prevList, food]);
   };

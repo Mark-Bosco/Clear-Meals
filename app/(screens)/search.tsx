@@ -4,6 +4,8 @@ import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { Food, MealType } from "../types";
 import { useFoodList } from '../FoodListContext';
+import { useAuth } from "../(auth)/AuthContext";
+import { saveMeal } from "../firestoreService";
 
 const getCalories = (food: Food): string => {
     return food.servings.serving[0].calories;
@@ -49,15 +51,11 @@ const Search = () => {
     const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
     const { foodList, removeFood, clearList } = useFoodList();
     const [suggestions, setSuggestions] = useState<string[]>([]);
-
-    // TODO
-    const handleListSave = () => {
-        router.back();
-    };
+    const { user } = useAuth();
 
     // Is reset results ever used?
-    const handleSearch = useCallback(async (resetResults: boolean = true) => {
-        if (loading || (resetResults && query.trim() === "")) return;
+    const handleSearch = useCallback(async (resetResults: boolean = true, searchQuery?: string) => {
+        if (loading || (resetResults && (searchQuery ?? query).trim() === "")) return;
 
         setLoading(true);
         // Clear suggestions on search entered
@@ -65,7 +63,7 @@ const Search = () => {
 
         try {
             const currentPage = resetResults ? 0 : page;
-            const results = await searchFood(query, currentPage);
+            const results = await searchFood(searchQuery ?? query, currentPage);
 
             if (results.error) {
                 console.error("API Error:", results.error);
@@ -122,8 +120,33 @@ const Search = () => {
     const handleSuggestionPress = useCallback((suggestion: string) => {
         setQuery(suggestion);
         setSuggestions([]);
-        handleSearch();
+        handleSearch(true, suggestion);
     }, [handleSearch]);
+    
+    const handleListSave = async () => {
+        if (!user || !user.uid) {
+          console.error('User not authenticated');
+          // Handle unauthenticated user (e.g., redirect to login)
+          return;
+        }
+    
+        if (!mealType) {
+          console.error('Meal type not specified');
+          // Handle missing meal type (e.g., show an error message to the user)
+          return;
+        }
+    
+        try {
+          await saveMeal(user.uid, mealType, foodList);
+          // Clear the food list after saving
+          clearList();
+          // Navigate back
+          router.back();
+        } catch (error) {
+          console.error('Error saving meal:', error);
+          // Handle error (e.g., show an error message to the user)
+        }
+      };
 
     const renderFoodListBubbles = () => (
         <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
@@ -191,7 +214,7 @@ const Search = () => {
                     placeholder="Search for food..."
                     value={query}
                     onChangeText={handleInputChange}
-                    onSubmitEditing={() => handleSearch()}
+                    onSubmitEditing={() => handleSearch(true, query)}
                 />
             </View>
             {suggestions.length > 0 && renderSuggestions()}

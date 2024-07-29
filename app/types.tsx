@@ -42,7 +42,7 @@ export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 // Represents a single meal, which is a collection of food items
 export interface Meal {
   type: MealType;
-  foods: Serving[];
+  foods: FoodListItem[];
   total_calories: number;
   total_fat?: number;
   total_carbs?: number;

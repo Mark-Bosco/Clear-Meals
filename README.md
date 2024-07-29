@@ -19,9 +19,8 @@
 - Move proxy server to cloud
 
 ### Search:
-- Search suggestions
-- Load search food list into cloud storage
 - Screen for no results
+- Merge same foods in food list
 
 ### Nutrition Screen:
 - Add a swipe feature to increment serving size by its default value
@@ -37,7 +36,6 @@
 - Calendar screen to load past meal logs
 
 ### Future:
-- Save user's daily logs to cloud and sync when logged in
 
 ### Misc:
 - Had to update whitelisted IPs when internet went down?
