@@ -37,17 +37,17 @@ export interface Serving {
 }
 
 // Represents a meal type (e.g., breakfast, lunch, dinner, snack)
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
 
 // Represents a single meal, which is a collection of food items
 export interface Meal {
   type: MealType;
   foods: FoodListItem[];
-  total_calories: number;
-  total_fat?: number;
-  total_carbs?: number;
-  total_protein?: number;
-  total_sodium?: number;
+  meal_calories: number;
+  meal_fat?: number;
+  meal_carbs?: number;
+  meal_protein?: number;
+  meal_sodium?: number;
 }
 
 // Represents a daily log, which includes all meals for a specific date
@@ -56,11 +56,6 @@ export interface DailyLog {
   meals: {
     [key in MealType]: Meal;
   };
-  total_calories: number;
-  total_fat?: number;
-  total_carbs?: number;
-  total_protein?: number;
-  total_sodium?: number;
 }
 
 // Represents a user's profile
