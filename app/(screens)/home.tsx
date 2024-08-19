@@ -1,31 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Platform, ActivityIndicator, Alert } from 'react-native';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useAuth } from '../(auth)/AuthContext';
-import { fetchDailyLog } from '../firestoreService';
+import { deleteFoodFromMeal, fetchDailyLog } from '../firestoreService';
 import { DailyLog, Meal, MealType } from '../types';
 import { format } from 'date-fns';
-
-type MenuName = 'nutMenu' | 'mealMenu';
-
-type VisibleMenus = {
-  [K in MenuName]: boolean;
-};
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [dailyLog, setDailyLog] = useState<DailyLog | null>(null);
   const [loading, setLoading] = useState(true);
-  const [visibleMenus, setVisibleMenus] = useState<VisibleMenus>({
-    nutMenu: false,
-    mealMenu: false
-  });
+  const [showNutrients, setShowNutrients] = useState(false);
+  const [showMealMenu, setShowMealMenu] = useState(false);
 
-  // Maybe merge food items and update database when loading in
   const loadDailyLog = useCallback(async () => {
     if (user && user.uid) {
       try {
@@ -41,18 +33,13 @@ const Home = () => {
     }
   }, [user]);
 
+  // Refresh daily log when naviagting to home screen
   useFocusEffect(
     useCallback(() => {
+      setShowMealMenu(false);
       loadDailyLog();
     }, [loadDailyLog])
   );
-
-  const toggleMenu = (menuName: MenuName): void => {
-    setVisibleMenus(prevState => ({
-      ...prevState,
-      [menuName]: !prevState[menuName]
-    }));
-  };
 
   const handleSignOut = async () => {
     try {
@@ -63,10 +50,84 @@ const Home = () => {
     }
   };
 
+  const handleDeleteFood = async (mealType: MealType, foodId: string) => {
+    if (user && dailyLog) {
+      try {
+        await deleteFoodFromMeal(user.uid, dailyLog.date, mealType, foodId);
+        // Refresh the daily log after deletion
+        loadDailyLog();
+      } catch (error) {
+        console.error('Error deleting food item:', error);
+        Alert.alert('Error', 'Failed to delete food item. Please try again.');
+      }
+    }
+  };
+
+  const renderRightActions = (mealType: MealType, foodId: string) => {
+    return (
+      <Pressable
+        className="bg-red-500 justify-center items-center w-20 h-15 rounded-xl ml-2"
+        onPress={() => handleDeleteFood(mealType, foodId)}
+      >
+        <Text className="text-white font-bold">Delete</Text>
+      </Pressable>
+    );
+  };
+
+  const toggleNutrients = () => {
+    setShowNutrients(!showNutrients);
+  };
+
+  const toggleMealMenu = () => {
+    setShowMealMenu(!showMealMenu);
+  };
+
   const totalCals = Object.values(dailyLog?.meals || {}).reduce((sum, meal) => {
     // Ensure calories are treated as numbers
     return sum + (meal.meal_calories || 0);
   }, 0);
+
+  const calculateTotalNutrients = () => {
+    if (!dailyLog) return null;
+
+    const totals = {
+      calories: 0,
+      fat: 0,
+      carbs: 0,
+      protein: 0,
+      sodium: 0,
+      fiber: 0,
+      sugar: 0,
+      cholesterol: 0,
+      saturated_fat: 0,
+      trans_fat: 0,
+      vitamin_a: 0,
+      vitamin_c: 0,
+      calcium: 0,
+      iron: 0,
+    };
+
+    Object.values(dailyLog.meals).forEach((meal) => {
+      totals.calories += meal.meal_calories || 0;
+      totals.fat += meal.meal_fat || 0;
+      totals.carbs += meal.meal_carbs || 0;
+      totals.protein += meal.meal_protein || 0;
+      totals.sodium += meal.meal_sodium || 0;
+      totals.fiber += meal.meal_fiber || 0;
+      totals.sugar += meal.meal_sugar || 0;
+      totals.cholesterol += meal.meal_cholesterol || 0;
+      totals.saturated_fat += meal.meal_saturated_fat || 0;
+      totals.trans_fat += meal.meal_trans_fat || 0;
+      totals.vitamin_a += meal.meal_vitamin_a || 0;
+      totals.vitamin_c += meal.meal_vitamin_c || 0;
+      totals.calcium += meal.meal_calcium || 0;
+      totals.iron += meal.meal_iron || 0;
+    });
+
+    return totals;
+  };
+
+  const totalNutrients = calculateTotalNutrients();
 
   if (loading) {
     return (
@@ -77,71 +138,92 @@ const Home = () => {
   }
 
   return (
-    <View className="flex-1 bg-white mt-10">
-      <View className="px-4 py-2 flex-row justify-between items-center">
-        <Pressable onPress={() => { }}>
-          <Ionicons name="calendar-clear-outline" size={36} color="gray" />
-        </Pressable>
-        <Text className="text-3xl text-gray-500 font-semibold">{format(new Date(), "MMMM do")}</Text>
-        <Pressable onPress={handleSignOut}>
-          <Ionicons name="cog-outline" size={36} color="gray" />
-        </Pressable>
-      </View>
+    <GestureHandlerRootView className="flex-1">
+      <View className="flex-1 bg-white mt-10">
+        <View className="px-4 py-2 flex-row justify-between items-center">
+          <Pressable onPress={() => { }}>
+            <Ionicons name="calendar-clear-outline" size={36} color="gray" />
+          </Pressable>
+          <Text className="text-3xl text-gray-500 font-semibold">{format(new Date(), "MMMM do")}</Text>
+          <Pressable onPress={handleSignOut}>
+            <Ionicons name="cog-outline" size={36} color="gray" />
+          </Pressable>
+        </View>
 
-      {/* Total Calories */}
-      <Pressable className="mx-4 my-2" onPress={() => toggleMenu('nutMenu')}>
-        <Text className="text-6xl font-bold text-center">
-          {totalCals}<Text className="font-normal text-gray-500"> Cals</Text>
-        </Text>
-      </Pressable>
-
-      {/* Meals */}
-      <ScrollView className="flex-1">
-        {Object.entries(dailyLog?.meals || {}).map(([mealType, meal]: [string, Meal]) => (
-          <View key={mealType} className="mx-4 my-2 rounded-xl bg-white p-2">
-            <View className='flex-row justify-between items-center mb-2'>
-              <Text className="text-4xl font-semibold">{mealType}</Text>
-              <Text className="text-3xl font-semibold text-gray-500">
-                {meal.meal_calories} <Text className="font-normal">Cals</Text>
-              </Text>
+        {/* Total Calories */}
+        <Pressable className="mx-4 my-2" onPress={toggleNutrients}>
+          <Text className="text-6xl font-bold text-center">
+            {totalCals}<Text className="font-normal text-gray-500"> Cals</Text>
+          </Text>
+          {showNutrients && (
+            <View className="mt-2">
+              <Text className="text-xl">Fat: {totalNutrients?.fat}g</Text>
+              <Text className="text-xl">Carbs: {totalNutrients?.carbs}g</Text>
+              <Text className="text-xl">Protein: {totalNutrients?.protein}g</Text>
+              <Text className="text-xl">Sodium: {totalNutrients?.sodium}mg</Text>
+              <Text className="text-xl">Fiber: {totalNutrients?.fiber}g</Text>
+              <Text className="text-xl">Sugar: {totalNutrients?.sugar}g</Text>
+              <Text className="text-xl">Cholesterol: {totalNutrients?.cholesterol}mg</Text>
+              <Text className="text-xl">Saturated Fat: {totalNutrients?.saturated_fat}g</Text>
+              <Text className="text-xl">Trans Fat: {totalNutrients?.trans_fat}g</Text>
+              <Text className="text-xl">Vitamin A: {totalNutrients?.vitamin_a}mcg</Text>
+              <Text className="text-xl">Vitamin C: {totalNutrients?.vitamin_c}mg</Text>
+              <Text className="text-xl">Calcium: {totalNutrients?.calcium}mg</Text>
+              <Text className="text-xl">Iron: {totalNutrients?.iron}mg</Text>
             </View>
-            {meal.foods.map((food, index) => (
-              <Pressable
-                key={index}
-                className="flex-row justify-between items-center my-1 bg-gray-100 rounded-xl p-2 px-4"
-                onPress={() => router.push({
-                  pathname: '/(screens)/nutrition',
-                  params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType as MealType, foodIndex: index }
-                })}
-              >
-                <Text className="text-2xl">{food.food_name}</Text>
-                <Text className="text-xl text-gray-600 px-8">+ {food.calories}</Text>
-              </Pressable>
+          )}
+        </Pressable>
+
+        {/* Meals */}
+        <ScrollView className="flex-1">
+          {Object.entries(dailyLog?.meals || {}).map(([mealType, meal]: [string, Meal]) => (
+            <View key={mealType} className="mx-4 my-2 rounded-xl bg-white p-2">
+              <View className='flex-row justify-between items-center mb-2'>
+                <Text className="text-4xl font-semibold">{mealType}</Text>
+                <Text className="text-3xl font-semibold text-gray-500">
+                  {meal.meal_calories} <Text className="font-normal">Cals</Text>
+                </Text>
+              </View>
+              {meal.foods.map((food, index) => (
+                <Swipeable key={index} renderRightActions={() => renderRightActions(mealType as MealType, food.food_id)}>
+                  <Pressable
+                    key={index}
+                    className="flex-row justify-between items-center my-1 bg-gray-100 rounded-xl p-2 px-4"
+                    onPress={() => router.push({
+                      pathname: '/(screens)/nutrition',
+                      params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType as MealType, foodIndex: index }
+                    })}
+                  >
+                    <Text className="text-2xl">{food.food_name}</Text>
+                    <Text className="text-xl text-gray-600 px-8">+ {food.calories}</Text>
+                  </Pressable>
+                </Swipeable>
+              ))}
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Meal Menu */}
+        {showMealMenu && (
+          <View className="flex col bg-green-700 p-2">
+            {(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as MealType[]).map((mealType) => (
+              <Link key={mealType} href={{ pathname: "/search", params: { mealType } }} asChild>
+                <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
+                  <Text className="text-4xl text-black font-bold">{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
+                </Pressable>
+              </Link>
             ))}
           </View>
-        ))}
-      </ScrollView>
+        )}
 
-      {/* Meal Menu */}
-      {visibleMenus.mealMenu && (
-        <View className="flex col bg-green-700 p-2">
-          {(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as MealType[]).map((mealType) => (
-            <Link key={mealType} href={{ pathname: "/search", params: { mealType } }} asChild>
-              <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
-                <Text className="text-4xl text-black font-bold">{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
-              </Pressable>
-            </Link>
-          ))}
-        </View>
-      )}
-
-      {/* Add Food Button */}
-      {!visibleMenus.mealMenu && (
-        <Pressable className="bg-green-700" onPress={() => toggleMenu('mealMenu')}>
-          <Text className="text-white text-center font-bold text-4xl py-3">Add Food</Text>
-        </Pressable>
-      )}
-    </View>
+        {/* Add Food Button */}
+        {!showMealMenu && (
+          <Pressable className="bg-green-700" onPress={toggleMealMenu}>
+            <Text className="text-white text-center font-bold text-4xl py-3">Add Food</Text>
+          </Pressable>
+        )}
+      </View>
+    </GestureHandlerRootView>
   );
 };
 

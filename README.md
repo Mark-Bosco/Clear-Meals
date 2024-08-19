@@ -28,8 +28,12 @@
 - Screen for no results
 
 ### Home:
-- Empty daily log message
-- Display nutrients (store them in firestore or look them up)
+- Stop meals from moving position on home screen, fix them in place
+- Ability to close meal menu
+- Fix long food item names messing up calorie alignment 
+- Display nutrients
+   - Store nutrients per meal, calculate when foods are added, or edited
+   - Finish implementing in firestoreService (saveFood, deleteFood, etc.)
 
 ### Settings:
 - Logout option
@@ -44,6 +48,9 @@
 - Organize project files
 
 ### Future:
+- I don't think we need to store Meal type inside any other types, investigate that
+- Maybe make meal menu slide up from the bottom
+- Empty daily log message
 - Add a swipe feature to increment/decrement serving size by its default value
 - Add FatSecret Attribution
 - Switch to style sheets and touchable opacity

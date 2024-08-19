@@ -203,6 +203,19 @@ const Nutrition: React.FC = () => {
                 food_name: food.food_name,
                 brand_name: food.brand_name || "Generic",
                 calories: currServing.calories,
+                fat: currServing.fat,
+                saturated_fat: currServing.saturated_fat,
+                trans_fat: currServing.trans_fat,
+                cholesterol: currServing.cholesterol,
+                sodium: currServing.sodium,
+                carbohydrate: currServing.carbohydrate,
+                fiber: currServing.fiber,
+                sugar: currServing.sugar,
+                protein: currServing.protein,
+                vitamin_a: currServing.vitamin_a,
+                vitamin_c: currServing.vitamin_c,
+                calcium: currServing.calcium,
+                iron: currServing.iron,
             };
 
             // If updating a saved food item
