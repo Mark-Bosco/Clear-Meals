@@ -155,7 +155,7 @@ const Search = () => {
                     {foodList.map((foodListItem, index) => (
                         <Pressable key={index} onPress={() => router.push({
                             pathname: '/(screens)/nutrition',
-                            params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodListIndex: index }
+                            params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodIndex: index }
                         })}
                             className="bg-green-700 rounded-full px-3 py-1 m-1 flex-row items-center">
                             <Text className="mr-2 text-white text-lg font-semibold">{foodListItem.food_name}</Text>

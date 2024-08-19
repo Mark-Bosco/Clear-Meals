@@ -26,12 +26,10 @@
 
 ### Search:
 - Screen for no results
-- Merge same foods (foodIds) in food search list (via FoodListContext add)
 
 ### Home:
-- Merge same foods when home screen is loaded 
-- Allow edits to logged foods from main menu
 - Empty daily log message
+- Display nutrients (store them in firestore or look them up)
 
 ### Settings:
 - Logout option
@@ -40,6 +38,7 @@
 ### History:
 - History screen shows a calendar
 - When a day is clicked on, load that days meal log
+- Will need to pass date around to update old logs
 
 ### Misc:
 - Organize project files

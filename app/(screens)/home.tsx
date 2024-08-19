@@ -105,11 +105,14 @@ const Home = () => {
                 {meal.meal_calories} <Text className="font-normal">Cals</Text>
               </Text>
             </View>
-            {meal.foods.map((food, idx) => (
+            {meal.foods.map((food, index) => (
               <Pressable
-                key={idx}
+                key={index}
                 className="flex-row justify-between items-center my-1 bg-gray-100 rounded-xl p-2 px-4"
-                onPress={() => console.log(`Clicked on ${food.food_name}`)}
+                onPress={() => router.push({
+                  pathname: '/(screens)/nutrition',
+                  params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType as MealType, foodIndex: index }
+                })}
               >
                 <Text className="text-2xl">{food.food_name}</Text>
                 <Text className="text-xl text-gray-600 px-8">+ {food.calories}</Text>

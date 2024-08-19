@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
-import { Food, FoodListItem, Serving } from "../types";
+import { Food, FoodListItem, MealType, Serving } from "../types";
 import { useFoodList } from '../FoodListContext';
+import { useAuth } from '../(auth)/AuthContext';
+import { saveFood } from '../firestoreService';
 
 const ozToGrams = (oz: number) => oz * 28.34952;
 const gramsToOz = (g: number) => g / 28.34952;
@@ -14,8 +16,11 @@ const Nutrition: React.FC = () => {
     const { foodId } = useLocalSearchParams<{ foodId: string }>();
     // Calorie override used for loading edited food list items
     const { calorieOverride } = useLocalSearchParams<{ calorieOverride: string }>();
-    const { foodListIndex } = useLocalSearchParams<{ foodListIndex: string }>();
+    const { foodIndex } = useLocalSearchParams<{ foodIndex: string }>();
+    const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
+    const { user } = useAuth();
     const [override, setOverride] = useState(false);
+
     // Collection of food servings
     const [food, setFood] = useState<Food | null>(null);
     // Index of currently displayed serving
@@ -191,8 +196,8 @@ const Nutrition: React.FC = () => {
         }
     };
 
-    const handleSave = () => {
-        if (food && currServing) {
+    const handleSave = async () => {
+        if (food && currServing && user) {
             const foodListItem: FoodListItem = {
                 food_id: food.food_id,
                 food_name: food.food_name,
@@ -200,9 +205,19 @@ const Nutrition: React.FC = () => {
                 calories: currServing.calories,
             };
 
-            // Replace
-            if (foodListIndex) {
-                replaceFood(parseInt(foodListIndex), foodListItem)
+            // If updating a saved food item
+            if (mealType) {
+                try {
+                    await saveFood(user.uid, mealType, foodListItem, foodIndex || '-1');
+                } catch (error) {
+                    console.error('Error updating food item in the meal:', error);
+                }
+
+                // If updating a food search list item
+            } else if (foodIndex) {
+                replaceFood(parseInt(foodIndex), foodListItem);
+
+                // If adding a food item to a search list
             } else {
                 addFood(foodListItem);
             }
@@ -258,7 +273,7 @@ const Nutrition: React.FC = () => {
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[80]"
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[50]"
                             keyboardType="numeric"
                             defaultValue={currServing.amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
@@ -271,7 +286,7 @@ const Nutrition: React.FC = () => {
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[80]"
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[50]"
                             keyboardType="numeric"
                             defaultValue={currServing.calories}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
