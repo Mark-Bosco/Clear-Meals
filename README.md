@@ -31,9 +31,7 @@
 - Stop meals from moving position on home screen, fix them in place
 - Ability to close meal menu
 - Fix long food item names messing up calorie alignment 
-- Display nutrients
-   - Store nutrients per meal, calculate when foods are added, or edited
-   - Finish implementing in firestoreService (saveFood, deleteFood, etc.)
+- Display nutrients prettier
 
 ### Settings:
 - Logout option

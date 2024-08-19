@@ -3,19 +3,20 @@ export interface FoodListItem {
   food_name: string;
   brand_name: string;
   calories: string;
-  fat?: string;
-  saturated_fat?: string;
-  trans_fat?: string;
-  cholesterol?: string;
-  sodium?: string;
-  carbohydrate?: string;
-  fiber?: string;
-  sugar?: string;
-  protein?: string;
-  vitamin_a?: string;
-  vitamin_c?: string;
-  calcium?: string;
-  iron?: string;
+  fat: string;
+  saturated_fat: string;
+  trans_fat: string;
+  cholesterol: string;
+  sodium: string;
+  carbohydrate: string;
+  fiber: string;
+  sugar: string;
+  protein: string;
+  vitamin_a: string;
+  vitamin_c: string;
+  calcium: string;
+  iron: string;
+  [key: string]: string; // This allows for additional string properties
 }
 
 export interface Food {
