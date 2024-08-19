@@ -7,7 +7,7 @@ interface FoodListContextType {
   addFood: (food: FoodListItem) => void;
   removeFood: (index: number) => void;
   clearList: () => void;
-  replaceFood: (index: number, updatedFood: FoodListItem) => void; // New function
+  replaceFood: (index: number, updatedFood: FoodListItem) => void;
 }
 
 const FoodListContext = createContext<FoodListContextType | undefined>(undefined);
@@ -15,9 +15,23 @@ const FoodListContext = createContext<FoodListContextType | undefined>(undefined
 export const FoodListProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [foodList, setFoodList] = useState<FoodListItem[]>([]);
 
-  // Merge same foods
   const addFood = (food: FoodListItem) => {
-    setFoodList((prevList) => [...prevList, food]);
+    setFoodList((prevList) => {
+      const existingFoodIndex = prevList.findIndex(item => item.food_id === food.food_id);
+      
+      if (existingFoodIndex !== -1) {
+        // If the food already exists, update its calories
+        const updatedList = [...prevList];
+        updatedList[existingFoodIndex] = {
+          ...updatedList[existingFoodIndex],
+          calories: (Number(updatedList[existingFoodIndex].calories) + Number(food.calories)).toString()
+        };
+        return updatedList;
+      } else {
+        // If it's a new food, add it to the list
+        return [...prevList, food];
+      }
+    });
   };
 
   const removeFood = (index: number) => {
@@ -28,7 +42,6 @@ export const FoodListProvider: React.FC<{ children: ReactNode }> = ({ children }
     setFoodList([]);
   };
 
-  // New replace function
   const replaceFood = (index: number, updatedFood: FoodListItem) => {
     setFoodList((prevList) => {
       const newList = [...prevList];

@@ -27,6 +27,8 @@ const Nutrition: React.FC = () => {
     // Reset the calorie and serving size inputs back to default
     const [reset, setReset] = useState(false);
     const { addFood, replaceFood } = useFoodList();
+    // Disable save button while editing serving size or calories
+    const [isEditing, setIsEditing] = useState(false);
 
     // Create default metric serving sizes, if they don't exist, for the selected food item
     const addMetricServings = (food: Food) => {
@@ -253,7 +255,10 @@ const Nutrition: React.FC = () => {
                 <View className="flex-row items-center justify-center">
                     <View className="flex-row items-center">
                         <TextInput
-                            className="bg-white text-2xl rounded px-2 py-1"
+                            textAlign="center"
+                            onFocus={() => setIsEditing(true)}
+                            onBlur={() => setIsEditing(false)}
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[80]"
                             keyboardType="numeric"
                             defaultValue={currServing.amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
@@ -261,9 +266,12 @@ const Nutrition: React.FC = () => {
                         />
                         <Text className="ml-2 text-2xl text-white font-bold">{currServing.unit}</Text>
                     </View>
-                    <View className="ml-10 flex-row items-center">
+                    <View className="ml-6 flex-row items-center">
                         <TextInput
-                            className="bg-white text-2xl rounded px-2 py-1"
+                            textAlign="center"
+                            onFocus={() => setIsEditing(true)}
+                            onBlur={() => setIsEditing(false)}
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[80]"
                             keyboardType="numeric"
                             defaultValue={currServing.calories}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
@@ -271,8 +279,8 @@ const Nutrition: React.FC = () => {
                         />
                         <Text className="ml-2 text-2xl text-white font-bold">cal</Text>
                     </View>
-                    <View className="ml-10 flex-row items-center bg-white rounded px-4 py-1">
-                        <Pressable onPress={handleSave}>
+                    <View className="ml-6 flex-row items-center bg-white rounded px-4 py-1">
+                        <Pressable onPress={handleSave} disabled={isEditing} style={{ opacity: isEditing ? 0.2 : 1 }}>
                             <Text className="text-2xl font-bold">Save</Text>
                         </Pressable>
                     </View>

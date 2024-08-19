@@ -122,31 +122,31 @@ const Search = () => {
         setSuggestions([]);
         handleSearch(true, suggestion);
     }, [handleSearch]);
-    
+
     const handleListSave = async () => {
         if (!user || !user.uid) {
-          console.error('User not authenticated');
-          // Handle unauthenticated user (e.g., redirect to login)
-          return;
+            console.error('User not authenticated');
+            // Handle unauthenticated user (e.g., redirect to login)
+            return;
         }
-    
+
         if (!mealType) {
-          console.error('Meal type not specified');
-          // Handle missing meal type (e.g., show an error message to the user)
-          return;
+            console.error('Meal type not specified');
+            // Handle missing meal type (e.g., show an error message to the user)
+            return;
         }
-    
+
         try {
-          await saveMeal(user.uid, mealType, foodList);
-          // Clear the food list after saving
-          clearList();
-          // Navigate back
-          router.back();
+            await saveMeal(user.uid, mealType, foodList);
+            // Clear the food list after saving
+            clearList();
+            // Navigate back
+            router.back();
         } catch (error) {
-          console.error('Error saving meal:', error);
-          // Handle error (e.g., show an error message to the user)
+            console.error('Error saving meal:', error);
+            // Handle error (e.g., show an error message to the user)
         }
-      };
+    };
 
     const renderFoodListBubbles = () => (
         <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
@@ -183,7 +183,7 @@ const Search = () => {
             ))}
         </View>
     );
-    
+
     const renderFoodItem = useCallback(({ item }: { item: Food }) => (
         <FoodResult
             food={item}

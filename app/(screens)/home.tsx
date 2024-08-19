@@ -25,6 +25,7 @@ const Home = () => {
     mealMenu: false
   });
 
+  // Maybe merge food items and update database when loading in
   const loadDailyLog = useCallback(async () => {
     if (user && user.uid) {
       try {
