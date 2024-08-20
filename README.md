@@ -21,7 +21,6 @@
 
 ## TODO
 ### Auth:
-- Delete account option
 - Move proxy server to cloud
 
 ### Search:
@@ -38,9 +37,7 @@
 - Delete account option
 
 ### History:
-- History screen shows a calendar
-- When a day is clicked on, load that days meal log
-- Will need to pass date around to update old logs
+- Improve frontend
 
 ### Misc:
 - Organize project files

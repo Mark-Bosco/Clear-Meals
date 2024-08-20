@@ -49,6 +49,8 @@ const Search = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
     const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
+    const { dateString } = useLocalSearchParams<{ dateString: string }>();
+    const date = ((dateString ? new Date(dateString) : new Date())).toISOString().split('T')[0]; // Convert the date to a string
     const { foodList, removeFood, clearList } = useFoodList();
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const { user } = useAuth();
@@ -137,7 +139,7 @@ const Search = () => {
         }
 
         try {
-            await saveMeal(user.uid, mealType, foodList);
+            await saveMeal(user.uid, date, mealType, foodList);
             // Clear the food list after saving
             clearList();
             // Navigate back

@@ -64,9 +64,8 @@ function calculateMealTotals(foods: FoodListItem[]): Meal {
   return totals;
 }
 
-export async function saveMeal(userId: string, mealType: MealType, foodList: FoodListItem[]) {
+export async function saveMeal(userId: string, date: string, mealType: MealType, foodList: FoodListItem[]) {
   try {
-    const date = new Date().toISOString().split('T')[0];
     const dailyLogRef = doc(db, 'users', userId, 'dailyLogs', date);
 
     const dailyLogSnap = await getDoc(dailyLogRef);
@@ -98,9 +97,8 @@ export async function saveMeal(userId: string, mealType: MealType, foodList: Foo
   }
 }
 
-export async function saveFood(userId: string, mealType: MealType, foodListItem: FoodListItem, foodIndex: string) {
+export async function saveFood(userId: string, date: string, mealType: MealType, foodListItem: FoodListItem, foodIndex: string) {
   try {
-    const date = new Date().toISOString().split('T')[0];
     const dailyLogRef = doc(db, 'users', userId, 'dailyLogs', date);
 
     const dailyLogSnap = await getDoc(dailyLogRef);

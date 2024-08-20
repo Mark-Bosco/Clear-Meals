@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Platform, ActivityIndicator, Alert } from 'react-native';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -9,6 +9,7 @@ import { deleteFoodFromMeal, fetchDailyLog } from '../firestoreService';
 import { DailyLog, Meal, MealType } from '../types';
 import { format } from 'date-fns';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { useLocalSearchParams } from 'expo-router';
 
 const Home = () => {
   const { user } = useAuth();
@@ -17,13 +18,15 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [showNutrients, setShowNutrients] = useState(false);
   const [showMealMenu, setShowMealMenu] = useState(false);
+  const { date } = useLocalSearchParams<{ date: string }>();
+  
 
   const loadDailyLog = useCallback(async () => {
     if (user && user.uid) {
       try {
         setLoading(true);
-        const today = new Date().toISOString().split('T')[0];
-        const log = await fetchDailyLog(user.uid, today);
+        const logDate = date || new Date().toISOString().split('T')[0];
+        const log = await fetchDailyLog(user.uid, logDate);
         setDailyLog(log);
       } catch (error) {
         console.error('Error loading daily log:', error);
@@ -31,7 +34,8 @@ const Home = () => {
         setLoading(false);
       }
     }
-  }, [user]);
+  }, [user, date]);
+
 
   // Refresh daily log when naviagting to home screen
   useFocusEffect(
@@ -141,14 +145,16 @@ const Home = () => {
     <GestureHandlerRootView className="flex-1">
       <View className="flex-1 bg-white mt-10">
         <View className="px-4 py-2 flex-row justify-between items-center">
-          <Pressable onPress={() => { }}>
-            <Ionicons name="calendar-clear-outline" size={36} color="gray" />
-          </Pressable>
-          <Text className="text-3xl text-gray-500 font-semibold">{format(new Date(), "MMMM do")}</Text>
-          <Pressable onPress={handleSignOut}>
-            <Ionicons name="cog-outline" size={36} color="gray" />
-          </Pressable>
-        </View>
+            <Pressable onPress={() => router.push('/history')}>
+              <Ionicons name="calendar-clear-outline" size={36} color="gray" />
+            </Pressable>
+            <Text className="text-3xl text-gray-500 font-semibold">
+              {format(date ? new Date(date) : new Date(), "MMMM do")}
+            </Text>
+            <Pressable onPress={handleSignOut}>
+              <Ionicons name="cog-outline" size={36} color="gray" />
+            </Pressable>
+          </View>
 
         {/* Total Calories */}
         <Pressable className="mx-4 my-2" onPress={toggleNutrients}>
@@ -191,7 +197,7 @@ const Home = () => {
                     className="flex-row justify-between items-center my-1 bg-gray-100 rounded-xl p-2 px-4"
                     onPress={() => router.push({
                       pathname: '/(screens)/nutrition',
-                      params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType as MealType, foodIndex: index }
+                      params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType as MealType, foodIndex: index, dateString: date }
                     })}
                   >
                     <Text className="text-2xl">{food.food_name}</Text>
@@ -207,7 +213,9 @@ const Home = () => {
         {showMealMenu && (
           <View className="flex col bg-green-700 p-2">
             {(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as MealType[]).map((mealType) => (
-              <Link key={mealType} href={{ pathname: "/search", params: { mealType } }} asChild>
+              <Link key={mealType} href={{ pathname: "/search", 
+              params: { mealType, dateString: date} 
+              }} asChild>
                 <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
                   <Text className="text-4xl text-black font-bold">{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
                 </Pressable>

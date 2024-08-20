@@ -18,6 +18,8 @@ const Nutrition: React.FC = () => {
     const { calorieOverride } = useLocalSearchParams<{ calorieOverride: string }>();
     const { foodIndex } = useLocalSearchParams<{ foodIndex: string }>();
     const { mealType } = useLocalSearchParams<{ mealType: MealType }>();
+    const { dateString } = useLocalSearchParams<{ dateString: string }>();
+    const date = ((dateString ? new Date(dateString) : new Date())).toISOString().split('T')[0]; // Convert the date to a string
     const { user } = useAuth();
     const [override, setOverride] = useState(false);
 
@@ -221,7 +223,7 @@ const Nutrition: React.FC = () => {
             // If updating a saved food item
             if (mealType) {
                 try {
-                    await saveFood(user.uid, mealType, foodListItem, foodIndex || '-1');
+                    await saveFood(user.uid, date, mealType, foodListItem, foodIndex || '-1');
                 } catch (error) {
                     console.error('Error updating food item in the meal:', error);
                 }
