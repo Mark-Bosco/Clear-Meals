@@ -1,7 +1,6 @@
-// firestoreService.ts
 import { db } from '../firebase';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { FoodListItem, Meal, MealType, DailyLog } from './types';
+import { FoodListItem, Meal, MealType, DailyLog } from '../app/types';
 
 function mergeDuplicateFoods(foodList: FoodListItem[]): FoodListItem[] {
   const mergedFoods: { [key: string]: FoodListItem } = {};

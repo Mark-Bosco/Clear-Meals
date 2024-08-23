@@ -3,9 +3,9 @@ import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollVi
 import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { Food, MealType } from "../types";
-import { useFoodList } from '../FoodListContext';
-import { useAuth } from "../(auth)/AuthContext";
-import { saveMeal } from "../firestoreService";
+import { useFoodList } from '../../contexts/FoodListContext';
+import { useAuth } from "../../contexts/AuthContext";
+import { saveMeal } from "../../backend/firestore";
 
 const getCalories = (food: Food): string => {
     return food.servings.serving[0].calories;

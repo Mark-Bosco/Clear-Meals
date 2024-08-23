@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { FoodListProvider } from "../FoodListContext";
+import { FoodListProvider } from "../../contexts/FoodListContext";
 
 export default function ScreensLayout() {
   return (

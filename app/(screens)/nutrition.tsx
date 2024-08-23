@@ -3,9 +3,9 @@ import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSynth
 import { router, useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
 import { Food, FoodListItem, MealType, Serving } from "../types";
-import { useFoodList } from '../FoodListContext';
-import { useAuth } from '../(auth)/AuthContext';
-import { saveFood } from '../firestoreService';
+import { useFoodList } from '../../contexts/FoodListContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { saveFood } from '../../backend/firestore';
 
 const ozToGrams = (oz: number) => oz * 28.34952;
 const gramsToOz = (g: number) => g / 28.34952;

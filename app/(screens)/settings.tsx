@@ -4,7 +4,7 @@ import { View, Text, Pressable, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signOut, deleteUser } from 'firebase/auth';
 import { auth } from '../../firebase';
-import { useAuth } from '../(auth)/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Settings = () => {
     const router = useRouter();

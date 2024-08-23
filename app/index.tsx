@@ -1,6 +1,6 @@
 // In index.tsx
 
-import { useAuth } from './(auth)/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Text } from 'react-native';

@@ -6,11 +6,11 @@ module.exports = {
     slug: "meal-tracker-v2",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/eating.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/splash.png",
+      image: "./assets/images/eating.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -19,7 +19,7 @@ module.exports = {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
+        foregroundImage: "./assets/images/eating.png",
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.mealtracker",
@@ -27,7 +27,7 @@ module.exports = {
     web: {
       bundler: "metro",
       output: "static",
-      favicon: "./assets/images/favicon.png"
+      favicon: "./assets/images/eating.png"
     },
     plugins: [
       "expo-router",

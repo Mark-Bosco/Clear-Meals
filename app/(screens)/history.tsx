@@ -3,8 +3,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
-import { fetchDailyLog } from '../firestoreService';
-import { useAuth } from '../(auth)/AuthContext';
+import { fetchDailyLog } from '../../backend/firestore';
+import { useAuth } from '../../contexts/AuthContext';
 import { DailyLog } from '../types';
 
 interface MarkedDates {
