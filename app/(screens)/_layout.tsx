@@ -10,7 +10,7 @@ export default function ScreensLayout() {
         <Stack.Screen name="search" options={{ headerShown: false }} />
         <Stack.Screen name="nutrition" options={{ headerShown: false }} />
         <Stack.Screen name="history" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="settings" options={{ headerShown: false }} /> */}
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
       </Stack>
     </FoodListProvider>
   );

@@ -19,7 +19,7 @@ const Home = () => {
   const [showNutrients, setShowNutrients] = useState(false);
   const [showMealMenu, setShowMealMenu] = useState(false);
   const { date } = useLocalSearchParams<{ date: string }>();
-  
+
 
   const loadDailyLog = useCallback(async () => {
     if (user && user.uid) {
@@ -145,16 +145,16 @@ const Home = () => {
     <GestureHandlerRootView className="flex-1">
       <View className="flex-1 bg-white mt-10">
         <View className="px-4 py-2 flex-row justify-between items-center">
-            <Pressable onPress={() => router.push('/history')}>
-              <Ionicons name="calendar-clear-outline" size={36} color="gray" />
-            </Pressable>
-            <Text className="text-3xl text-gray-500 font-semibold">
-              {format(date ? new Date(date) : new Date(), "MMMM do")}
-            </Text>
-            <Pressable onPress={handleSignOut}>
-              <Ionicons name="cog-outline" size={36} color="gray" />
-            </Pressable>
-          </View>
+          <Pressable onPress={() => router.push('/history')}>
+            <Ionicons name="calendar-clear-outline" size={36} color="gray" />
+          </Pressable>
+          <Text className="text-3xl text-gray-500 font-semibold">
+            {format(date ? new Date(date) : new Date(), "MMMM do")}
+          </Text>
+          <Pressable onPress={() => router.push('/settings')}>
+            <Ionicons name="cog-outline" size={36} color="gray" />
+          </Pressable>
+        </View>
 
         {/* Total Calories */}
         <Pressable className="mx-4 my-2" onPress={toggleNutrients}>
@@ -213,8 +213,9 @@ const Home = () => {
         {showMealMenu && (
           <View className="flex col bg-green-700 p-2">
             {(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as MealType[]).map((mealType) => (
-              <Link key={mealType} href={{ pathname: "/search", 
-              params: { mealType, dateString: date} 
+              <Link key={mealType} href={{
+                pathname: "/search",
+                params: { mealType, dateString: date }
               }} asChild>
                 <Pressable className="items-center bg-gray-100 p-2 mt-2 mx-2 rounded-xl">
                   <Text className="text-4xl text-black font-bold">{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
