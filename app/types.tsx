@@ -19,6 +19,22 @@ export interface FoodListItem {
   [key: string]: string; // This allows for additional string properties
 }
 
+export interface TotalNutrients {
+  protein: number;
+  fat: number;
+  carbs: number;
+  sodium: number;
+  cholesterol: number;
+  vitamin_a: number;
+  fiber: number;
+  saturated_fat: number;
+  sugar: number;
+  vitamin_c: number;
+  calcium: number;
+  trans_fat: number;
+  iron: number;
+}
+
 export interface Food {
   food_id: string;
   food_name: string;

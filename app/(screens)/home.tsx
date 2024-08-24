@@ -6,10 +6,11 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { deleteFoodFromMeal, fetchDailyLog } from '../../backend/firestore';
-import { DailyLog, Meal, MealType } from '../types';
+import { DailyLog, Meal, MealType, TotalNutrients } from '../types';
 import { format } from 'date-fns';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { useLocalSearchParams } from 'expo-router';
+import NutrientDisplay from '@/components/NutrientDisplay';
 
 const Home = () => {
   const { user } = useAuth();
@@ -90,11 +91,10 @@ const Home = () => {
     return sum + (meal.meal_calories || 0);
   }, 0);
 
-  const calculateTotalNutrients = () => {
+  const calculateTotalNutrients = (): TotalNutrients | null => {
     if (!dailyLog) return null;
 
-    const totals = {
-      calories: 0,
+    const totals: TotalNutrients  = {
       fat: 0,
       carbs: 0,
       protein: 0,
@@ -111,7 +111,6 @@ const Home = () => {
     };
 
     Object.values(dailyLog.meals).forEach((meal) => {
-      totals.calories += meal.meal_calories || 0;
       totals.fat += meal.meal_fat || 0;
       totals.carbs += meal.meal_carbs || 0;
       totals.protein += meal.meal_protein || 0;
@@ -129,8 +128,6 @@ const Home = () => {
 
     return totals;
   };
-
-  const totalNutrients = calculateTotalNutrients();
 
   if (loading) {
     return (
@@ -160,23 +157,8 @@ const Home = () => {
           <Text className="text-6xl font-bold text-center">
             {totalCals}<Text className="font-normal text-gray-500"> Cals</Text>
           </Text>
-          {showNutrients && (
-            <View className="mt-2">
-              <Text className="text-xl">Fat: {totalNutrients?.fat}g</Text>
-              <Text className="text-xl">Carbs: {totalNutrients?.carbs}g</Text>
-              <Text className="text-xl">Protein: {totalNutrients?.protein}g</Text>
-              <Text className="text-xl">Sodium: {totalNutrients?.sodium}mg</Text>
-              <Text className="text-xl">Fiber: {totalNutrients?.fiber}g</Text>
-              <Text className="text-xl">Sugar: {totalNutrients?.sugar}g</Text>
-              <Text className="text-xl">Cholesterol: {totalNutrients?.cholesterol}mg</Text>
-              <Text className="text-xl">Saturated Fat: {totalNutrients?.saturated_fat}g</Text>
-              <Text className="text-xl">Trans Fat: {totalNutrients?.trans_fat}g</Text>
-              <Text className="text-xl">Vitamin A: {totalNutrients?.vitamin_a}mcg</Text>
-              <Text className="text-xl">Vitamin C: {totalNutrients?.vitamin_c}mg</Text>
-              <Text className="text-xl">Calcium: {totalNutrients?.calcium}mg</Text>
-              <Text className="text-xl">Iron: {totalNutrients?.iron}mg</Text>
-            </View>
-          )}
+          {/* Total Nutrients */}
+          {showNutrients && (<NutrientDisplay totalNutrients={calculateTotalNutrients()} />)}
         </Pressable>
 
         {/* Meals */}

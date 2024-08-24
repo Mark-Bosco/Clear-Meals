@@ -252,7 +252,7 @@ const Nutrition: React.FC = () => {
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-white mt-10 p-4">
+        <SafeAreaView className="flex-1 bg-white mt-12 p-4">
             <ScrollView>
                 <Text className="text-5xl text-center font-bold">{food.food_name}</Text>
                 <Text className="text-3xl text-center mb-6">{food.brand_name || "Generic"}</Text>
@@ -288,7 +288,7 @@ const Nutrition: React.FC = () => {
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[50]"
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[70]"
                             keyboardType="numeric"
                             defaultValue={currServing.amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
@@ -301,7 +301,7 @@ const Nutrition: React.FC = () => {
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[50]"
+                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[70]"
                             keyboardType="numeric"
                             defaultValue={currServing.calories}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
@@ -309,7 +309,7 @@ const Nutrition: React.FC = () => {
                         />
                         <Text className="ml-2 text-2xl text-white font-bold">cal</Text>
                     </View>
-                    <View className="ml-6 flex-row items-center bg-white rounded px-4 py-1">
+                    <View className="ml-6 flex-row items-center bg-white rounded px-5 py-2">
                         <Pressable onPress={handleSave} disabled={isEditing} style={{ opacity: isEditing ? 0.2 : 1 }}>
                             <Text className="text-2xl font-bold">Save</Text>
                         </Pressable>

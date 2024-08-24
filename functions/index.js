@@ -42,8 +42,7 @@ async function getAccessToken(uid) {
       })
     });
 
-    const accessToken = response.data.access_token;
-    const expiresIn = response.data.expires_in;
+    const { access_token: accessToken, expires_in: expiresIn } = response.data;
 
     // Store the token in Firestore
     await userRef.set({
