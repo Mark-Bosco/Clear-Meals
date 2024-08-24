@@ -21,7 +21,6 @@
 
 ## TODO
 ### Auth:
-- Move proxy server to cloud
 
 ### Search:
 - Screen for no results
@@ -30,19 +29,17 @@
 - Stop meals from moving position on home screen, fix them in place
 - Ability to close meal menu
 - Fix long food item names messing up calorie alignment 
-- Display nutrients prettier
+- Improve frontend
 
 ### Settings:
-- Logout option
-- Delete account option
 
 ### History:
 - Improve frontend
 
 ### Misc:
-- Organize project files
 
 ### Future:
+- Icons
 - I don't think we need to store Meal type inside any other types, investigate that
 - Maybe make meal menu slide up from the bottom
 - Empty daily log message

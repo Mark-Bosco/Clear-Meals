@@ -20,7 +20,6 @@ const Home = () => {
   const [showMealMenu, setShowMealMenu] = useState(false);
   const { date } = useLocalSearchParams<{ date: string }>();
 
-
   const loadDailyLog = useCallback(async () => {
     if (user && user.uid) {
       try {

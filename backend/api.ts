@@ -1,25 +1,33 @@
 import axios from 'axios';
-import Constants from 'expo-constants';
 import { auth } from '../firebase';
+import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 
-const proxyIp = Constants.expoConfig?.extra?.proxyIp;
+const functions = getFunctions();
+
+interface AccessTokenResponse {
+  access_token: string;
+}
 
 // Get access token from the backend
-const getAccessToken = async () => {
-  //console.log('Requesting access token from the backend...');
-
+const getAccessToken = async (): Promise<string> => {
   try {
     const user = auth.currentUser;
     if (!user) {
       throw new Error('User not authenticated');
     }
-
-    const idToken = await user.getIdToken();
-    const response = await axios.post(`http://${proxyIp}:3000/user-token`, { idToken });
-    //console.log('Received response from the backend:', response.data);
-    return response.data.access_token;
+    console.log('Calling getUserToken function...');
+    const getUserToken = httpsCallable<unknown, AccessTokenResponse>(functions, 'getUserToken');
+    const result: HttpsCallableResult<AccessTokenResponse> = await getUserToken();
+    
+    console.log('getUserToken function call result:', result);
+    
+    if (result.data && result.data.access_token) {
+      return result.data.access_token;
+    } else {
+      throw new Error('Invalid response from server');
+    }
   } catch (error: any) {
-    //console.error('Error getting access token', error);
+    console.error('Error getting access token', error);
     throw error;
   }
 };
