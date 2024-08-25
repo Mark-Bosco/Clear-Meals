@@ -40,14 +40,10 @@
    - History and settings buttons
 
 ### Future:
-- Screen for no results
-- Optimze reload logic
-- I don't think we need to store Meal type inside any other types, investigate that
-- Maybe make meal menu slide up from the bottom
+- Search screen for no results
 - Empty daily log message
 - Add gestures
    - Add a swipe feature to increment/decrement serving size by its default value
-- Add FatSecret Attribution
+- Add FatSecret attribution
 - Add animations
 - Add sounds
-- Upload to google play
