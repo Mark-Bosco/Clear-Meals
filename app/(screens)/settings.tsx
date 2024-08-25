@@ -58,6 +58,7 @@ const Settings = () => {
             console.error('Error deleting account:', error);
             Alert.alert('Error', 'Failed to delete account. Please try again.');
         } finally {
+            setPassword("");
             setIsDeleting(false);
             setIsModalVisible(false);
         }
@@ -82,12 +83,26 @@ const Settings = () => {
         <View style={styles.container}>
             <Text style={styles.title}>Settings</Text>
 
-            <Pressable style={styles.button} onPress={handleSignOut}>
+            {user && user.email && (
+                <View style={styles.emailContainer}>
+                    <Text style={styles.emailLabel}>Logged in as:</Text>
+                    <Text style={styles.emailText}>{user.email}</Text>
+                </View>
+            )}
+
+            <Pressable onPress={handleSignOut} style={({ pressed }) => [
+                styles.button,
+                pressed && styles.pressedButton
+            ]}>
                 <Text style={styles.buttonText}>Log Out</Text>
             </Pressable>
 
             <Pressable
-                style={[styles.button, styles.deleteButton]}
+                style={({ pressed }) => [
+                    styles.button,
+                    styles.deleteButton,
+                    pressed && styles.pressedButton
+                ]}
                 onPress={confirmDeleteAccount}
                 disabled={isDeleting}
             >
@@ -114,7 +129,11 @@ const Settings = () => {
                         />
                         <View style={styles.modalButtons}>
                             <Pressable
-                                style={[styles.button, styles.cancelButton]}
+                                style={({ pressed }) => [
+                                    styles.button,
+                                    styles.cancelButton,
+                                    pressed && styles.pressedButton
+                                ]}
                                 onPress={() => {
                                     setIsModalVisible(false);
                                     setPassword('');
@@ -123,7 +142,11 @@ const Settings = () => {
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </Pressable>
                             <Pressable
-                                style={[styles.button, styles.deleteButton]}
+                                style={({ pressed }) => [
+                                    styles.button,
+                                    styles.deleteButton,
+                                    pressed && styles.pressedButton
+                                ]}
                                 onPress={handleDeleteAccount}
                             >
                                 <Text style={styles.buttonText}>Delete</Text>
@@ -138,10 +161,33 @@ const Settings = () => {
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
+        flex: 1,
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        padding: 20,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
         marginTop: 40,
+    },
+    pressedButton: {
+        opacity: .6
+    },
+    emailContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+        backgroundColor: '#f3f4f6',
+        paddingBottom: 15,
+        borderRadius: 10,
+        width: '100%',
+    },
+    emailLabel: {
+        fontSize: 16,
+        color: '#4b5563',
+        marginBottom: 5,
+    },
+    emailText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1f2937',
     },
     title: {
         fontSize: 40,
@@ -165,7 +211,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 18,
-        fontWeight: 'bold'
+        fontWeight: '500'
     },
     centeredView: {
         flex: 1,

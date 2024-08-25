@@ -112,15 +112,8 @@ export default function SignUp() {
             placeholder="Confirm Password"
             value={value.confirmPassword}
             onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, confirmPassword: text }))}
-            secureTextEntry={!showConfirmPassword}
+            secureTextEntry={true}
           />
-          <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <Ionicons
-              name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
-              size={24}
-              color="gray"
-            />
-          </Pressable>
         </View>
 
         <Pressable

@@ -18,9 +18,9 @@ const getAccessToken = async (): Promise<string> => {
     //console.log('Calling getUserToken function...');
     const getUserToken = httpsCallable<unknown, AccessTokenResponse>(functions, 'getUserToken');
     const result: HttpsCallableResult<AccessTokenResponse> = await getUserToken();
-    
+
     //console.log('getUserToken function call result:', result);
-    
+
     if (result.data && result.data.access_token) {
       return result.data.access_token;
     } else {
@@ -59,8 +59,16 @@ const searchFood = async (query: string, page: number = 0) => {
         region: 'US',
       }
     });
-    
-    return response.data;
+
+    // Check if the response contains valid data
+    if (response.data && response.data.foods_search) {
+      return {
+        ...response.data.foods_search,
+        foods: response.data.foods_search.results ? response.data.foods_search.results.food || [] : []
+      };
+    } else {
+      return { foods: [], total_results: 0, max_results: 20, page_number: page };
+    }
   } catch (error) {
     console.error('Error searching food', error);
     throw error;
@@ -100,7 +108,13 @@ const getAutocompleteSearch = async (expression: string) => {
         max_results: 6,
       }
     });
-    return response.data.suggestions.suggestion;
+    
+    // Check if the response contains valid suggestions
+    if (response.data && response.data.suggestions && Array.isArray(response.data.suggestions.suggestion)) {
+      return response.data.suggestions.suggestion;
+    } else {
+      return [];
+    }
   } catch (error) {
     console.error('Error getting autocomplete suggestions', error);
     return [];

@@ -37,6 +37,7 @@ const Nutrition: React.FC = () => {
     const { addFood, replaceFood } = useFoodList();
     // Disable save button while editing serving size or calories
     const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Create default metric serving sizes, if they don't exist, for the selected food item
     const addMetricServings = (food: Food) => {
@@ -200,6 +201,11 @@ const Nutrition: React.FC = () => {
     };
 
     const handleSave = async () => {
+        if (isSaving)
+            return;
+
+        setIsSaving(true);
+
         if (food && currServing && user) {
             const foodListItem: FoodListItem = {
                 food_id: food.food_id,
@@ -238,7 +244,7 @@ const Nutrition: React.FC = () => {
                 addFood(foodListItem);
             }
         }
-
+        setIsSaving(false);
         router.back();
     };
 
@@ -264,7 +270,12 @@ const Nutrition: React.FC = () => {
             <View>
                 <View style={styles.servingTypeContainer}>
                     <Text style={styles.servingTypeText}>Serving Type:</Text>
-                    <Pressable style={styles.resetButton} onPress={() => setReset(true)}>
+                    <Pressable onPress={() => setReset(true)}
+                        style={({ pressed }) => [
+                            styles.resetButton,
+                            pressed && styles.pressedButton
+                        ]}
+                    >
                         <Text style={styles.resetButtonText}>Reset</Text>
                     </Pressable>
                 </View>
@@ -319,18 +330,12 @@ const Nutrition: React.FC = () => {
                             disabled={isEditing}
                             style={({ pressed }) => [
                                 styles.saveButton,
-                                isEditing && styles.disabledSaveButton,
-                                pressed && styles.pressedSaveButton
-                            ]}
-                        >
-                            {({ pressed }) => (
-                                <Text style={[
-                                    styles.saveButtonText,
-                                    pressed && styles.pressedSaveButtonText
-                                ]}>
-                                    Save
-                                </Text>
-                            )}
+                                isEditing && styles.pressedButton,
+                                pressed && styles.pressedButton
+                            ]}>
+                            <Text style={styles.saveButtonText}>
+                                Save
+                            </Text>
                         </Pressable>
                     </View>
                 </View>
@@ -450,20 +455,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 8,
     },
-    disabledSaveButton: {
-        backgroundColor: '#a7aaaf',
-        opacity: .75
-    },
-    pressedSaveButton: {
-        backgroundColor: '#D1D5DB',
+    pressedButton: {
+        opacity: .6
     },
     saveButtonText: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#0c4c24',
-    },
-    pressedSaveButtonText: {
-        color: '#166534',
     },
 });
 

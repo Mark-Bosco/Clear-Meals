@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { StyleSheet, View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView, Alert } from "react-native";
+import React, { useState, useCallback, useMemo, useRef } from "react";
+import { StyleSheet, View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView, Alert, Keyboard } from "react-native";
 import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
 import { Food, MealType } from "../../types/types";
@@ -55,45 +55,36 @@ const Search = () => {
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const { user } = useAuth();
     const [isSaving, setIsSaving] = useState(false);
+    const flatListRef = useRef<FlatList>(null);
 
-    // Is reset results ever used?
     const handleSearch = useCallback(async (resetResults: boolean = true, searchQuery?: string) => {
         if (loading || (resetResults && (searchQuery ?? query).trim() === "")) return;
 
         setLoading(true);
-        // Clear suggestions on search entered
         setSuggestions([]);
 
         try {
             const currentPage = resetResults ? 0 : page;
             const results = await searchFood(searchQuery ?? query, currentPage);
 
-            if (results.error) {
-                console.error("API Error:", results.error);
-                setSearchResults([]);
-                setHasMore(false);
-                return;
-            }
-
-            if (!results.foods_search || !results.foods_search.results || !results.foods_search.results.food) {
-                console.error("Unexpected API response structure:", results);
-                setSearchResults([]);
-                setHasMore(false);
-                return;
-            }
-
-            const foods = results.foods_search.results.food;
-
-            setSearchResults(prevResults => resetResults ? foods : [...prevResults, ...foods]);
-            // Do we need 2 page variables?
+            setSearchResults(prevResults => resetResults ? results.foods : [...prevResults, ...results.foods]);
             setPage(currentPage + 1);
-            setHasMore((results.foods_search.max_results * page) < results.foods_search.total_results)
+            setHasMore(results.foods.length > 0 && (results.max_results * (currentPage + 1)) < results.total_results);
 
+            if (results.foods.length === 0 && resetResults) {
+                Alert.alert("No results", "No foods found matching your search.");
+            }
+
+            // Scroll to the top when a new search is performed
+            if (resetResults && flatListRef.current) {
+                flatListRef.current.scrollToOffset({ offset: 0, animated: false });
+            }
 
         } catch (error) {
             console.error("Error searching for food:", error);
             setSearchResults([]);
             setHasMore(false);
+            Alert.alert("Error", "An error occurred while searching for food. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -124,6 +115,7 @@ const Search = () => {
         setQuery(suggestion);
         setSuggestions([]);
         handleSearch(true, suggestion);
+        Keyboard.dismiss();
     }, [handleSearch]);
 
     const handleListSave = async () => {
@@ -147,7 +139,7 @@ const Search = () => {
 
     const renderFoodListBubbles = () => (
         <View style={styles.foodListContainer}>
-            <ScrollView>
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                 <View style={styles.foodListContent}>
                     {foodList.map((foodListItem, index) => (
                         <Pressable
@@ -156,11 +148,18 @@ const Search = () => {
                                 pathname: '/(screens)/nutrition',
                                 params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodIndex: index }
                             })}
-                            style={styles.foodBubble}
+                            style={({ pressed }) => [
+                                styles.foodBubble,
+                                pressed && styles.pressedButton
+                            ]}
                         >
                             <Text style={styles.foodBubbleName}>{foodListItem.food_name}</Text>
                             <Text style={styles.foodBubbleCalories}>({foodListItem.calories} cals)</Text>
-                            <Pressable onPress={() => removeFood(index)}>
+                            <Pressable onPress={() => removeFood(index)}
+                                style={({ pressed }) => [
+                                    pressed && styles.pressedButton
+                                ]}
+                            >
                                 <Text style={styles.removeButton}>×</Text>
                             </Pressable>
                         </Pressable>
@@ -175,8 +174,11 @@ const Search = () => {
             {suggestions.map((suggestion, index) => (
                 <Pressable
                     key={index}
-                    style={styles.suggestionItem}
                     onPress={() => handleSuggestionPress(suggestion)}
+                    style={({ pressed }) => [
+                        styles.suggestionItem,
+                        pressed && styles.pressedButton
+                    ]}
                 >
                     <Text>{suggestion}</Text>
                 </Pressable>
@@ -215,7 +217,10 @@ const Search = () => {
                     placeholder="Search for food..."
                     value={query}
                     onChangeText={handleInputChange}
-                    onSubmitEditing={() => handleSearch(true, query)}
+                    onSubmitEditing={() => {
+                        handleSearch(true, query);
+                        Keyboard.dismiss();
+                    }}
                 />
             </View>
             {suggestions.length > 0 && renderSuggestions()}
@@ -231,14 +236,25 @@ const Search = () => {
                 updateCellsBatchingPeriod={50}
                 initialNumToRender={20}
                 windowSize={21}
+                ref={flatListRef}
             />
             {foodList.length > 0 && (
                 <View style={styles.buttonContainer}>
-                    <Pressable style={styles.clearButton} onPress={clearList}>
+                    <Pressable
+                        onPress={clearList}
+                        style={({ pressed }) => [
+                            styles.clearButton,
+                            pressed && styles.pressedButton
+                        ]}
+                    >
                         <Text style={styles.buttonText}>Clear Meal</Text>
                     </Pressable>
                     <Pressable
-                        style={[styles.saveButton, isSaving && styles.savingButton]}
+                        style={({ pressed }) => [
+                            styles.saveButton,
+                            pressed && styles.pressedButton,
+                            isSaving && styles.savingButton
+                        ]}
                         onPress={handleListSave}
                         disabled={isSaving}
                     >
@@ -301,20 +317,17 @@ const styles = StyleSheet.create({
     },
     foodListContainer: {
         backgroundColor: '#d0e5d8',
-        paddingHorizontal: 16,
         paddingVertical: 8,
-        maxHeight: 125,
     },
     foodListContent: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
     },
     foodBubble: {
         backgroundColor: '#15803D',
-        borderRadius: 9999,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        margin: 4,
+        borderRadius: 12,
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        margin: 6,
         flexDirection: 'row',
         alignItems: 'center',
     },
@@ -332,12 +345,14 @@ const styles = StyleSheet.create({
     },
     removeButton: {
         color: 'white',
-        fontSize: 20,
+        fontSize: 26,
         fontWeight: 'bold',
         backgroundColor: '#B91C1C',
-        borderRadius: 8,
+        borderRadius: 10,
         textAlign: 'center',
-        width: 20
+        width: 30,
+        height: 30,
+        lineHeight: 33,
     },
     searchInputContainer: {
         paddingHorizontal: 16,
@@ -371,6 +386,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         padding: 16,
         backgroundColor: '#d0e5d8',
+    },
+    pressedButton: {
+        opacity: .6
     },
     clearButton: {
         backgroundColor: '#B91C1C',

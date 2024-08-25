@@ -6,17 +6,17 @@ module.exports = {
     slug: "clear-meals",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/eating.png",
+    icon: "./assets/images/icon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/eating.png",
+      image: "./assets/images/icon.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/eating.png",
+        foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.clearmeals",

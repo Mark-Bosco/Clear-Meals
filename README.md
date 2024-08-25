@@ -31,9 +31,6 @@
 ### History:
 
 ### Misc:
-- Make github presentable, add project to resume
-- Make shareable APK
-- Add name and icon
 
 ### Future:
 - Search screen for no results

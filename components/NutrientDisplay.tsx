@@ -16,22 +16,22 @@ const NutrientDisplay: React.FC<NutrientDisplayProps> = ({ totalNutrients }) => 
   return (
     <View style={styles.container}>
       <View style={styles.column}>
-        <NutrientItem label="Protein" value={totalNutrients?.protein ?? 0} type={'g'}/>
+        <NutrientItem label="Protein" value={totalNutrients?.protein ?? 0} type={'g'} />
         <NutrientItem label="Fat" value={totalNutrients?.fat ?? 0} type={'g'} />
-        <NutrientItem label="Carbs" value={totalNutrients?.carbs ?? 0} type={'g'}/>
-        <NutrientItem label="Sodium" value={totalNutrients?.sodium ?? 0} type={'mg'}/>
+        <NutrientItem label="Carbs" value={totalNutrients?.carbs ?? 0} type={'g'} />
+        <NutrientItem label="Sodium" value={totalNutrients?.sodium ?? 0} type={'mg'} />
       </View>
       <View style={styles.column}>
-        <NutrientItem label="Chol" value={totalNutrients?.cholesterol ?? 0} type={'mg'}/>
-        <NutrientItem label="Vit A" value={totalNutrients?.vitamin_a ?? 0} type={'mcg'}/>
-        <NutrientItem label="Fiber" value={totalNutrients?.fiber ?? 0} type={'g'}/>
-        <NutrientItem label="Sat Fat" value={totalNutrients?.saturated_fat ?? 0} type={'g'}/>
+        <NutrientItem label="Chol" value={totalNutrients?.cholesterol ?? 0} type={'mg'} />
+        <NutrientItem label="Vit A" value={totalNutrients?.vitamin_a ?? 0} type={'mcg'} />
+        <NutrientItem label="Fiber" value={totalNutrients?.fiber ?? 0} type={'g'} />
+        <NutrientItem label="Sat Fat" value={totalNutrients?.saturated_fat ?? 0} type={'g'} />
       </View>
       <View style={styles.column}>
-        <NutrientItem label="Sugar" value={totalNutrients?.sugar ?? 0} type={'g'}/>
-        <NutrientItem label="Vit C" value={totalNutrients?.vitamin_c ?? 0} type={'mcg'}/>
-        <NutrientItem label="Calcium" value={totalNutrients?.calcium ?? 0} type={'mg'}/>
-        <NutrientItem label="Iron" value={totalNutrients?.iron ?? 0} type={'mg'}/>
+        <NutrientItem label="Sugar" value={totalNutrients?.sugar ?? 0} type={'g'} />
+        <NutrientItem label="Vit C" value={totalNutrients?.vitamin_c ?? 0} type={'mcg'} />
+        <NutrientItem label="Calcium" value={totalNutrients?.calcium ?? 0} type={'mg'} />
+        <NutrientItem label="Iron" value={totalNutrients?.iron ?? 0} type={'mg'} />
       </View>
     </View>
   );

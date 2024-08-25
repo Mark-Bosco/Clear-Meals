@@ -35,7 +35,7 @@ const History = () => {
     }
 
     const logs: (DailyLog | null)[] = await Promise.all(
-      dateArray.map(date => 
+      dateArray.map(date =>
         fetchDailyLog(user.uid, date.toISOString().split('T')[0])
       )
     );
@@ -51,11 +51,11 @@ const History = () => {
       }
     });
 
-    setMarkedDates(prevMarkedDates => ({...prevMarkedDates, ...newMarkedDates}));
+    setMarkedDates(prevMarkedDates => ({ ...prevMarkedDates, ...newMarkedDates }));
   }, [user]);
 
   const handleDayPress = (day: DateData) => {
-    router.push({
+    router.navigate({
       pathname: '/home',
       params: { date: day.dateString }
     });

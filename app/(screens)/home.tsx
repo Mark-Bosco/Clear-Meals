@@ -21,6 +21,7 @@ const Home = () => {
   const [showMealMenu, setShowMealMenu] = useState(false);
   const { date } = useLocalSearchParams<{ date: string }>();
   const slideAnim = useRef(new Animated.Value(400)).current;
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const getCurrentLocalDate = () => {
     const now = new Date();
@@ -49,13 +50,16 @@ const Home = () => {
   );
 
   const handleDeleteFood = async (mealType: MealType, foodId: string) => {
-    if (user && dailyLog) {
+    if (user && dailyLog && !isDeleting) {
       try {
+        setIsDeleting(true);
         await deleteFoodFromMeal(user.uid, dailyLog.date, mealType, foodId);
         loadDailyLog();
       } catch (error) {
         console.error('Error deleting food item:', error);
         Alert.alert('Error', 'Failed to delete food item. Please try again.');
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
@@ -63,8 +67,11 @@ const Home = () => {
   const renderRightActions = (mealType: MealType, foodId: string) => {
     return (
       <Pressable
-        style={styles.deleteButton}
         onPress={() => handleDeleteFood(mealType, foodId)}
+        style={({ pressed }) => [
+          styles.deleteButton,
+          pressed && styles.pressedButton
+        ]}
       >
         <Text style={styles.deleteButtonText}>Delete</Text>
       </Pressable>
@@ -125,18 +132,28 @@ const Home = () => {
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.mainContainer}>
         <View style={styles.header}>
-          <Pressable onPress={() => router.push('/(screens)/history')}>
+          <Pressable onPress={() => router.push('/(screens)/history')} style={({ pressed }) => [
+            pressed && styles.pressedButton
+          ]}
+          >
             <Ionicons name="calendar-clear-outline" size={36} color="gray" />
           </Pressable>
           <Text style={styles.dateText}>
             {format(parseISO(date || getCurrentLocalDate()), "MMMM do")}
           </Text>
-          <Pressable onPress={() => router.push('/settings')}>
+          <Pressable onPress={() => router.push('/settings')} style={({ pressed }) => [
+            pressed && styles.pressedButton
+          ]}
+          >
             <Ionicons name="cog-outline" size={36} color="gray" />
           </Pressable>
         </View>
 
-        <Pressable style={styles.caloriesContainer} onPress={toggleNutrients}>
+        <Pressable onPress={toggleNutrients} style={({ pressed }) => [
+          styles.caloriesContainer,
+          pressed && styles.pressedButton
+        ]}
+        >
           <Text style={styles.caloriesText}>
             {totalCals}<Text style={styles.caloriesUnit}> Cals</Text>
           </Text>
@@ -158,11 +175,14 @@ const Home = () => {
                 {meal.foods.map((food, index) => (
                   <Swipeable key={index} renderRightActions={() => renderRightActions(mealType, food.food_id)}>
                     <Pressable
-                      style={styles.foodItem}
                       onPress={() => router.push({
                         pathname: '/(screens)/nutrition',
                         params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType, foodIndex: index, dateString: date }
                       })}
+                      style={({ pressed }) => [
+                        styles.foodItem,
+                        pressed && styles.pressedButton
+                      ]}
                     >
                       <Text style={styles.foodName} numberOfLines={1} ellipsizeMode="tail">{food.food_name}</Text>
                       <Text style={styles.foodCalories}>+ {food.calories}</Text>
@@ -184,8 +204,11 @@ const Home = () => {
         >
           <View style={styles.mealMenuContent}>
             <Pressable
-              style={styles.closeMealMenuButton}
               onPress={toggleMealMenu}
+              style={({ pressed }) => [
+                styles.closeMealMenuButton,
+                pressed && styles.pressedButton
+              ]}
             >
               <Text style={styles.closeMealMenuText}>Close</Text>
             </Pressable>
@@ -203,7 +226,11 @@ const Home = () => {
         </Animated.View>
 
         {!showMealMenu && (
-          <Pressable style={styles.addFoodButton} onPress={toggleMealMenu}>
+          <Pressable onPress={toggleMealMenu} style={({ pressed }) => [
+            styles.addFoodButton,
+            pressed && styles.pressedButton
+          ]}
+          >
             <Text style={styles.addFoodButtonText}>Add Food</Text>
           </Pressable>
         )}
@@ -215,6 +242,9 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  pressedButton: {
+    opacity: .6
   },
   mainContainer: {
     flex: 1,
