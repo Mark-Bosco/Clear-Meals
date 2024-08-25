@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: "Clear Meals",
     slug: "clear-meals",
-    version: "1.0.0-alpha",
+    version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "myapp",
