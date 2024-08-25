@@ -21,7 +21,6 @@
 
 ## TODO
 ### Auth:
-Fix sign up button
 
 ### Search:
 
@@ -33,6 +32,7 @@ Fix sign up button
 ### History:
 
 ### Misc:
+- Make github presentable, add project to resume
 - Make shareable APK
 - Add name and icon
 - Update buttton responsiveness 

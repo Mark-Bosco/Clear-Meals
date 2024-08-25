@@ -2,8 +2,8 @@ require('dotenv').config();
 
 module.exports = {
   expo: {
-    name: "meal-tracker-v2",
-    slug: "meal-tracker-v2",
+    name: "Clear Meals",
+    slug: "clear-meals",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/eating.png",
@@ -14,20 +14,12 @@ module.exports = {
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
-    ios: {
-      supportsTablet: true
-    },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/images/eating.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.bosco.mealtracker",
-    },
-    web: {
-      bundler: "metro",
-      output: "static",
-      favicon: "./assets/images/eating.png"
+      package: "com.bosco.clearmeals",
     },
     plugins: [
       "expo-router",
