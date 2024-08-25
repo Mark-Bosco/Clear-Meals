@@ -15,11 +15,11 @@ const getAccessToken = async (): Promise<string> => {
     if (!user) {
       throw new Error('User not authenticated');
     }
-    console.log('Calling getUserToken function...');
+    //console.log('Calling getUserToken function...');
     const getUserToken = httpsCallable<unknown, AccessTokenResponse>(functions, 'getUserToken');
     const result: HttpsCallableResult<AccessTokenResponse> = await getUserToken();
     
-    console.log('getUserToken function call result:', result);
+    //console.log('getUserToken function call result:', result);
     
     if (result.data && result.data.access_token) {
       return result.data.access_token;

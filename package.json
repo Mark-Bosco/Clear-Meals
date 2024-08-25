@@ -41,7 +41,7 @@
     "express": "^4.19.2",
     "firebase": "^10.12.4",
     "firebase-admin": "^12.2.0",
-    "nativewind": "4.0.1",
+    "lottie-react-native": "^6.7.2",
     "node-cache": "^5.1.2",
     "oauth-1.0a": "^2.2.6",
     "react": "18.2.0",

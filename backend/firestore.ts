@@ -1,6 +1,6 @@
 import { db } from '../firebase';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { FoodListItem, Meal, MealType, DailyLog } from '../app/types';
+import { doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import { FoodListItem, Meal, MealType, DailyLog } from '../types/types';
 
 function mergeDuplicateFoods(foodList: FoodListItem[]): FoodListItem[] {
   const mergedFoods: { [key: string]: FoodListItem } = {};
@@ -89,7 +89,7 @@ export async function saveMeal(userId: string, date: string, mealType: MealType,
       },
     }, { merge: true });
 
-    console.log('Meal saved successfully');
+    //console.log('Meal saved successfully');
   } catch (error) {
     console.error('Error saving meal:', error);
     throw error;
@@ -119,7 +119,7 @@ export async function saveFood(userId: string, date: string, mealType: MealType,
         [`meals.${mealType}`]: updatedMeal
       });
 
-      console.log('Food item updated successfully');
+      //console.log('Food item updated successfully');
     } else {
       console.error('Meal not found in the daily log');
       throw new Error('Meal not found in the daily log');
@@ -149,7 +149,7 @@ export async function deleteFoodFromMeal(userId: string, date: string, mealType:
           [`meals.${mealType}`]: updatedMeal
         });
 
-        console.log('Food item deleted successfully');
+        //console.log('Food item deleted successfully');
       } else {
         console.error('Meal not found in the daily log');
         throw new Error('Meal not found in the daily log');
@@ -176,6 +176,25 @@ export async function fetchDailyLog(userId: string, date: string): Promise<Daily
     }
   } catch (error) {
     console.error('Error fetching daily log:', error);
+    throw error;
+  }
+}
+
+export async function deleteUserData(userId: string): Promise<void> {
+  try {
+    // Delete all daily logs
+    const dailyLogsRef = collection(db, 'users', userId, 'dailyLogs');
+    const dailyLogsSnapshot = await getDocs(dailyLogsRef);
+    const deletionPromises = dailyLogsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletionPromises);
+
+    // Delete the user document itself
+    const userDocRef = doc(db, 'users', userId);
+    await deleteDoc(userDocRef);
+
+    //console.log('User data deleted successfully');
+  } catch (error) {
+    console.error('Error deleting user data:', error);
     throw error;
   }
 }

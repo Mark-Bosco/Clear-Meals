@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, SafeAreaView, Pressable, TextInput, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { getFood } from "../../backend/api";
-import { Food, FoodListItem, MealType, Serving } from "../types";
+import { Food, FoodListItem, MealType, Serving } from "../../types/types";
 import { useFoodList } from '../../contexts/FoodListContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { saveFood } from '../../backend/firestore';
+import NutritionLabel from '../../components/NutritionLabel'
 
 const ozToGrams = (oz: number) => oz * 28.34952;
 const gramsToOz = (g: number) => g / 28.34952;
@@ -245,73 +246,80 @@ const Nutrition: React.FC = () => {
     // Early return if food or currServing is null
     if (!food || !currServing) {
         return (
-            <SafeAreaView className="flex-1 bg-white mt-10 p-4">
-                <Text className="text-2xl text-center">Loading...</Text>
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.loadingText}>Loading...</Text>
             </SafeAreaView>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-white mt-12 p-4">
+        <SafeAreaView style={styles.container}>
             <ScrollView>
-                <Text className="text-5xl text-center font-bold">{food.food_name}</Text>
-                <Text className="text-3xl text-center mb-6">{food.brand_name || "Generic"}</Text>
+                <Text style={styles.foodName}>{food.food_name}</Text>
+                <Text style={styles.brandName}>{food.brand_name || "Generic"}</Text>
                 <NutritionLabel
                     currServing={currServing}
                 />
             </ScrollView>
             <View>
-                <View className='flex-row justify-between mt-4'>
-                    <Text className='text-3xl font-bold py-1'>Serving Type:</Text>
-                    <Pressable className="bg-gray-500 rounded px-4 justify-center active:bg-gray-600" onPress={() => setReset(true)}>
-                        <Text className="text-white text-xl font-bold">Reset</Text>
+                <View style={styles.servingTypeContainer}>
+                    <Text style={styles.servingTypeText}>Serving Type:</Text>
+                    <Pressable style={styles.resetButton} onPress={() => setReset(true)}>
+                        <Text style={styles.resetButtonText}>Reset</Text>
                     </Pressable>
                 </View>
-                <View className="border-b border-black my-2" />
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="">
+                <View style={styles.divider} />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.servingScrollView}>
                     {food.servings.serving.map((serving, index) => (
                         <Pressable
                             key={index}
-                            className={`mr-2 p-3 border border-gray-300 rounded ${servingIndex === index ? 'bg-green-700' : 'bg-gray-500'}`}
+                            style={[
+                                styles.servingButton,
+                                servingIndex === index ? styles.activeServingButton : styles.inactiveServingButton
+                            ]}
                             onPress={() => setServingIndex(index)}
                         >
-                            <Text className='text-2xl font-bold text-white'>{`${serving.serving_description.replace(/^\d+.\d+|\d+\s*/, '')}`}</Text>
+                            <Text style={styles.servingButtonText}>{`${serving.serving_description.replace(/^\d+.\d+|\d+\s*/, '')}`}</Text>
                         </Pressable>
                     ))}
                 </ScrollView>
             </View>
-            <View className="border-b border-black my-2" />
-            <View className='bg-green-700 rounded-xl p-3 mt-2'>
-                <View className="flex-row items-center justify-center">
-                    <View className="flex-row items-center">
+            <View style={styles.divider} />
+            <View style={styles.inputContainer}>
+                <View style={styles.inputRow}>
+                    <View style={styles.inputGroup}>
                         <TextInput
+                            style={styles.input}
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[70]"
                             keyboardType="numeric"
                             defaultValue={currServing.amount}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
                                 handleServingSizeChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-2xl text-white font-bold">{currServing.unit}</Text>
+                        <Text style={styles.inputLabel}>{currServing.unit}</Text>
                     </View>
-                    <View className="ml-6 flex-row items-center">
+                    <View style={styles.inputGroup}>
                         <TextInput
+                            style={styles.input}
                             textAlign="center"
                             onFocus={() => setIsEditing(true)}
                             onBlur={() => setIsEditing(false)}
-                            className="bg-white text-2xl rounded px-2 py-1 text-center w-[70]"
                             keyboardType="numeric"
                             defaultValue={currServing.calories}
                             onSubmitEditing={(e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) =>
                                 handleCalorieChange(e.nativeEvent.text)}
                         />
-                        <Text className="ml-2 text-2xl text-white font-bold">cal</Text>
+                        <Text style={styles.inputLabel}>cal</Text>
                     </View>
-                    <View className="ml-6 flex-row items-center bg-white rounded px-5 py-2">
-                        <Pressable onPress={handleSave} disabled={isEditing} style={{ opacity: isEditing ? 0.2 : 1 }}>
-                            <Text className="text-2xl font-bold">Save</Text>
+                    <View style={styles.saveButtonContainer}>
+                        <Pressable
+                            onPress={handleSave}
+                            disabled={isEditing}
+                            style={[styles.saveButton, isEditing && styles.disabledSaveButton]}
+                        >
+                            <Text style={styles.saveButtonText}>Save</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -320,154 +328,125 @@ const Nutrition: React.FC = () => {
     );
 };
 
-const NutritionLabel: React.FC<{ currServing: Serving; }> = ({ currServing }) => {
-    return (
-        <View className="border-2 border-black p-3 mb-4 bg-gray-100">
-            <Text className="ml-1 text-3xl text-left font-extrabold">
-                Nutrition Facts
-            </Text>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between mt-1 mb-1">
-                <Text className="ml-1 flex-3 font-semibold text-xl">
-                    Serving Size
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-semibold text-xl">
-                    {currServing.amount} {currServing.unit}
-                </Text>
-                <Text className="mr-1 text-right font-semibold text-xl">
-                    {currServing.unit === "g" || currServing.unit === "oz" ? ""
-                        : `(${currServing.metric_serving_amount}${currServing.metric_serving_unit})`}
-                </Text>
-            </View>
-            <View className="border-b-8 border-black"></View>
-            <View className="flex-row justify-between mt-2 mb-1">
-                <Text className="ml-1 flex-3 font-extrabold text-3xl">
-                    Calories
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-3xl">
-                    {currServing.calories}
-                </Text>
-            </View>
-            <View className="border-b-4 border-black"></View>
-            <View className="flex-row justify-between mt-1">
-                <Text className="ml-1 flex-3 font-extrabold text-lg">
-                    Total Fat
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
-                    {currServing.fat == "N/A" ? "N/A" : `${currServing.fat}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-8 flex-3 text-lg">
-                    Saturated Fat
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.saturated_fat == "N/A" ? "N/A" : `${currServing.saturated_fat}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-8 flex-3 text-lg">
-                    Trans Fat
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.trans_fat == "N/A" ? "N/A" : `${currServing.trans_fat}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 font-extrabold text-lg">
-                    Cholesterol
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
-                    {currServing.cholesterol == "N/A" ? "N/A" : `${currServing.cholesterol}mg`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 font-extrabold text-lg">
-                    Sodium
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
-                    {currServing.sodium == "N/A" ? "N/A" : `${currServing.sodium}mg`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 font-extrabold text-lg">
-                    Total Carbohydrate
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
-                    {currServing.carbohydrate == "N/A" ? "N/A" : `${currServing.carbohydrate}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-8 flex-3 text-lg">
-                    Dietary Fiber
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.fiber == "N/A" ? "N/A" : `${currServing.fiber}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-8 flex-3 text-lg">
-                    Total Sugars
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.sugar == "N/A" ? "N/A" : `${currServing.sugar}g`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 font-extrabold text-lg">
-                    Protein
-                </Text>
-                <Text className="mr-1 flex-1 text-right font-extrabold text-xl">
-                    {currServing.protein == "N/A" ? "N/A" : `${currServing.protein}g`}
-                </Text>
-            </View>
-            <View className="border-b-8 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 text-lg">
-                    Vitamin A
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.vitamin_a == "N/A" ? "N/A" : `${currServing.vitamin_a}mcg`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 text-lg">
-                    Vitamin C
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.vitamin_c == "N/A" ? "N/A" : `${currServing.vitamin_c}mg`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 text-lg">
-                    Calcium
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.calcium == "N/A" ? "N/A" : `${currServing.calcium}mg`}
-                </Text>
-            </View>
-            <View className="border-b-2 border-black"></View>
-            <View className="flex-row justify-between">
-                <Text className="ml-1 flex-3 text-lg">
-                    Iron
-                </Text>
-                <Text className="mr-1 flex-1 text-right text-xl">
-                    {currServing.iron == "N/A" ? "N/A" : `${currServing.iron}mg`}
-                </Text>
-            </View>
-            <View className="border-b-4 border-black"></View>
-        </View>
-    );
-};
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        marginTop: 48,
+        padding: 16,
+    },
+    loadingText: {
+        fontSize: 24,
+        textAlign: 'center',
+    },
+    foodName: {
+        fontSize: 36,
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    brandName: {
+        fontSize: 26,
+        fontWeight: '300',
+        textAlign: 'center',
+        marginBottom: 24,
+    },
+    servingTypeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 16,
+    },
+    servingTypeText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        paddingVertical: 4,
+    },
+    resetButton: {
+        backgroundColor: '#6B7280',
+        borderRadius: 4,
+        paddingHorizontal: 16,
+        justifyContent: 'center',
+    },
+    resetButtonText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    divider: {
+        borderBottomWidth: 1,
+        borderBottomColor: 'black',
+        marginVertical: 8,
+    },
+    servingScrollView: {
+        flexDirection: 'row',
+    },
+    servingButton: {
+        marginRight: 8,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 4,
+    },
+    activeServingButton: {
+        backgroundColor: '#15803D',
+    },
+    inactiveServingButton: {
+        backgroundColor: '#6B7280',
+    },
+    servingButtonText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    inputContainer: {
+        backgroundColor: '#15803D',
+        borderRadius: 12,
+        padding: 12,
+        marginTop: 8,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inputGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    input: {
+        backgroundColor: 'white',
+        fontSize: 26,
+        borderRadius: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        textAlign: 'center',
+        width: 70,
+    },
+    inputLabel: {
+        fontSize: 20,
+        marginLeft: 6,
+        marginRight: 8,
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    saveButtonContainer: {
+        marginLeft: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 4,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+    },
+    saveButton: {
+        opacity: 1,
+    },
+    disabledSaveButton: {
+        opacity: 0.2,
+    },
+    saveButtonText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+});
 
 export default Nutrition;

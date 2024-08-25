@@ -1,6 +1,6 @@
 // FoodListContext.tsx
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { FoodListItem } from '../app/types';
+import { FoodListItem } from '../types/types';
 
 interface FoodListContextType {
   foodList: FoodListItem[];

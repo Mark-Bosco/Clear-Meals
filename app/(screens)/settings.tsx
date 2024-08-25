@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { signOut, deleteUser } from 'firebase/auth';
 import { auth } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { deleteUserData } from '@/backend/firestore';
 
 const Settings = () => {
     const router = useRouter();
@@ -26,7 +27,12 @@ const Settings = () => {
 
         setIsDeleting(true);
         try {
+            // First, delete the user's Firestore data
+            await deleteUserData(user.uid);
+
+            // Then, delete the user account
             await deleteUser(user);
+
             router.replace('/(auth)/signin');
         } catch (error) {
             console.error('Error deleting account:', error);
@@ -39,7 +45,7 @@ const Settings = () => {
     const confirmDeleteAccount = () => {
         Alert.alert(
             'Delete Account',
-            'Are you sure you want to delete your account? This action cannot be undone.',
+            'Are you sure you want to delete your account? This action cannot be undone and will delete all your data.',
             [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Delete', onPress: handleDeleteAccount, style: 'destructive' },

@@ -21,27 +21,23 @@
 
 ## TODO
 ### Auth:
+Fix sign up button
 
 ### Search:
-- Move nutrition facts to seperate component file
 
 ### Home:
-- Stop meals from moving position on home screen, fix them in place
-- Ability to close meal menu
-- Fix long food item names messing up calorie alignment 
 
 ### Settings:
-- Delete user's data from firebase after account deletion
+- Requires user to sign in before deleting account
 
 ### History:
-- Improve frontend
-   - Center, replace blue with green
 
 ### Misc:
-- Remove console logging for performance
-- Switch to style sheets
 - Make shareable APK
 - Add name and icon
+- Update buttton responsiveness 
+   - Nutrition save button
+   - History and settings buttons
 
 ### Future:
 - Screen for no results
@@ -49,7 +45,9 @@
 - I don't think we need to store Meal type inside any other types, investigate that
 - Maybe make meal menu slide up from the bottom
 - Empty daily log message
-- Add a swipe feature to increment/decrement serving size by its default value
+- Add gestures
+   - Add a swipe feature to increment/decrement serving size by its default value
 - Add FatSecret Attribution
-- Add animations and sounds
-- Upload to google play or 
+- Add animations
+- Add sounds
+- Upload to google play

@@ -3,7 +3,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router } from 'expo-router';
 import React from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Pressable, Text, TextInput, View } from 'react-native';
 
 export default function SignUp() {
   const [value, setValue] = React.useState({
@@ -59,30 +59,30 @@ export default function SignUp() {
   }
 
   return (
-    <View className="flex-1 pt-20 bg-white items-center justify-top p-4">
-      <Text className="text-6xl font-bold mb-4">Sign Up</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Sign Up</Text>
 
       {!!value.error && (
-        <View className="mt-2 p-2 bg-red-500 rounded">
-          <Text className="text-white">{value.error}</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{value.error}</Text>
         </View>
       )}
 
-      <View className="w-full">
-        <View className="flex-row items-center border-b border-gray-300 py-2 mb-4">
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
           <Ionicons name="mail-outline" size={24} color="gray" />
           <TextInput
-            className="flex-1 ml-2"
+            style={styles.input}
             placeholder="Email"
             value={value.email}
             onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, email: text }))}
           />
         </View>
 
-        <View className="flex-row items-center border-b border-gray-300 py-2 mb-4">
+        <View style={styles.inputContainer}>
           <Ionicons name="key-outline" size={24} color="gray" />
           <TextInput
-            className="flex-1 ml-2"
+            style={styles.input}
             placeholder="Password"
             value={value.password}
             onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, password: text }))}
@@ -91,11 +91,11 @@ export default function SignUp() {
         </View>
 
         <Pressable
-          className="bg-green-700 py-2 px-4 rounded active:bg-green-800"
+          style={({ pressed }) => [styles.signUpButton, pressed && styles.buttonPressed]}
           onPress={signUp}
         >
           {({ pressed }) => (
-            <Text className={`text-white text-center font-bold ${pressed ? 'opacity-75' : ''}`}>
+            <Text style={[styles.buttonText, pressed && styles.textPressed]}>
               Sign up
             </Text>
           )}
@@ -103,10 +103,10 @@ export default function SignUp() {
 
         <Link href="/signin" asChild>
           <Pressable
-            className="mt-4"
+            style={styles.signInButton}
             onPress={resetFields}>
             {({ pressed }) => (
-              <Text className={`text-center text-gray-600 ${pressed ? 'opacity-75' : ''}`}>
+              <Text style={[styles.linkText, pressed && styles.textPressed]}>
                 Sign in
               </Text>
             )}
@@ -116,3 +116,67 @@ export default function SignUp() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 80,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 16,
+  },
+  title: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  errorContainer: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#EF4444',
+    borderRadius: 4,
+  },
+  errorText: {
+    color: 'white',
+  },
+  formContainer: {
+    width: '100%',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#D1D5DB',
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  input: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  signUpButton: {
+    backgroundColor: '#15803D',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  buttonPressed: {
+    backgroundColor: '#166534',
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  signInButton: {
+    marginTop: 16,
+  },
+  linkText: {
+    textAlign: 'center',
+    color: '#4B5563',
+  },
+  textPressed: {
+    opacity: 0.75,
+  },
+});

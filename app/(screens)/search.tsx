@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView } from "react-native";
+import { StyleSheet, View, Text, TextInput, FlatList, Pressable, ActivityIndicator, ScrollView, Alert } from "react-native";
 import { searchFood, getAutocompleteSearch } from "../../backend/api";
 import { router, useLocalSearchParams } from "expo-router";
-import { Food, MealType } from "../types";
+import { Food, MealType } from "../../types/types";
 import { useFoodList } from '../../contexts/FoodListContext';
 import { useAuth } from "../../contexts/AuthContext";
 import { saveMeal } from "../../backend/firestore";
@@ -12,28 +12,28 @@ const getCalories = (food: Food): string => {
 };
 
 const getServingSize = (food: Food): string => {
-    return food.servings.serving[0].serving_description.split(' ').slice(0, 3).join(' ');;
+    return food.servings.serving[0].serving_description.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '');
 }
 
 const FoodResult = React.memo(({ food, onPress }: { food: Food; onPress: () => void }) => (
     <Pressable
-        className="mx-6 my-2 bg-gray-100 rounded-2xl p-4"
+        style={styles.foodResultContainer}
         onPress={onPress}>
         {({ pressed }) => (
-            <View className="flex-row">
-                <View className="flex-1 pr-2">
-                    <Text className={`text-lg font-bold flex-wrap ${pressed ? 'text-gray-600' : 'text-black'}`}>
+            <View style={styles.foodResultContent}>
+                <View style={styles.foodInfoContainer}>
+                    <Text style={[styles.foodName, pressed && styles.pressedText]}>
                         {food.food_name}
                     </Text>
-                    <Text className={`text-lg ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Text style={[styles.brandName, pressed && styles.pressedText]}>
                         {food.brand_name || "Generic"}
                     </Text>
                 </View>
-                <View className="justify-center">
-                    <Text className={`text-lg text-right ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                <View style={styles.caloriesContainer}>
+                    <Text style={[styles.calories, pressed && styles.pressedText]}>
                         {getCalories(food)} cals
                     </Text>
-                    <Text className={`text-md text-right ${pressed ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <Text style={[styles.servingSize, pressed && styles.pressedText]}>
                         {getServingSize(food)}
                     </Text>
                 </View>
@@ -54,6 +54,7 @@ const Search = () => {
     const { foodList, removeFood, clearList } = useFoodList();
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const { user } = useAuth();
+    const [isSaving, setIsSaving] = useState(false);
 
     // Is reset results ever used?
     const handleSearch = useCallback(async (resetResults: boolean = true, searchQuery?: string) => {
@@ -126,44 +127,41 @@ const Search = () => {
     }, [handleSearch]);
 
     const handleListSave = async () => {
-        if (!user || !user.uid) {
-            console.error('User not authenticated');
-            // Handle unauthenticated user (e.g., redirect to login)
+        if (isSaving || !user || !user.uid || !mealType) {
             return;
         }
 
-        if (!mealType) {
-            console.error('Meal type not specified');
-            // Handle missing meal type (e.g., show an error message to the user)
-            return;
-        }
-
+        setIsSaving(true);
         try {
             await saveMeal(user.uid, date, mealType, foodList);
-            // Clear the food list after saving
             clearList();
-            // Navigate back
             router.back();
         } catch (error) {
             console.error('Error saving meal:', error);
-            // Handle error (e.g., show an error message to the user)
+            // Show an error message to the user
+            Alert.alert('Error', 'Failed to save meal. Please try again.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
     const renderFoodListBubbles = () => (
-        <View className="bg-gray-100 px-4 py-2" style={{ maxHeight: 100 }}>
+        <View style={styles.foodListContainer}>
             <ScrollView>
-                <View className="flex-row flex-wrap">
+                <View style={styles.foodListContent}>
                     {foodList.map((foodListItem, index) => (
-                        <Pressable key={index} onPress={() => router.push({
-                            pathname: '/(screens)/nutrition',
-                            params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodIndex: index }
-                        })}
-                            className="bg-green-700 rounded-full px-3 py-1 m-1 flex-row items-center">
-                            <Text className="mr-2 text-white text-lg font-semibold">{foodListItem.food_name}</Text>
-                            <Text className="mr-2 text-white text-md">({foodListItem.calories} cals)</Text>
+                        <Pressable
+                            key={index}
+                            onPress={() => router.push({
+                                pathname: '/(screens)/nutrition',
+                                params: { foodId: foodListItem.food_id, calorieOverride: foodListItem.calories, foodIndex: index }
+                            })}
+                            style={styles.foodBubble}
+                        >
+                            <Text style={styles.foodBubbleName}>{foodListItem.food_name}</Text>
+                            <Text style={styles.foodBubbleCalories}>({foodListItem.calories} cals)</Text>
                             <Pressable onPress={() => removeFood(index)}>
-                                <Text className="text-red-700 text-xl font-bold">×</Text>
+                                <Text style={styles.removeButton}>×</Text>
                             </Pressable>
                         </Pressable>
                     ))}
@@ -173,11 +171,11 @@ const Search = () => {
     );
 
     const renderSuggestions = () => (
-        <View className="bg-white border border-gray-200 rounded-xl mx-4">
+        <View style={styles.suggestionsContainer}>
             {suggestions.map((suggestion, index) => (
                 <Pressable
                     key={index}
-                    className="p-2 border-b border-gray-200"
+                    style={styles.suggestionItem}
                     onPress={() => handleSuggestionPress(suggestion)}
                 >
                     <Text>{suggestion}</Text>
@@ -199,7 +197,7 @@ const Search = () => {
     const renderFooter = useMemo(() => {
         if (!loading) return null;
         return (
-            <View className="py-4">
+            <View style={styles.loadingFooter}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
@@ -207,12 +205,13 @@ const Search = () => {
 
     const keyExtractor = useCallback((food: Food) => food.food_id, []);
 
+
     return (
-        <View className="flex-1 bg-white mt-12">
+        <View style={styles.container}>
             {foodList.length > 0 && renderFoodListBubbles()}
-            <View className="px-4 mt-2">
+            <View style={styles.searchInputContainer}>
                 <TextInput
-                    className="my-1 bg-gray-200 rounded-xl p-2 px-4"
+                    style={styles.searchInput}
                     placeholder="Search for food..."
                     value={query}
                     onChangeText={handleInputChange}
@@ -234,12 +233,18 @@ const Search = () => {
                 windowSize={21}
             />
             {foodList.length > 0 && (
-                <View className="flex-row justify-around p-4 bg-white">
-                    <Pressable className="bg-red-700 p-2 rounded flex-1 mr-2" onPress={clearList}>
-                        <Text className="text-white text-center font-bold text-xl">Clear List</Text>
+                <View style={styles.buttonContainer}>
+                    <Pressable style={styles.clearButton} onPress={clearList}>
+                        <Text style={styles.buttonText}>Clear Meal</Text>
                     </Pressable>
-                    <Pressable className="bg-green-700 p-2 rounded flex-1 ml-2" onPress={handleListSave}>
-                        <Text className="text-white text-center font-bold text-xl">Save List</Text>
+                    <Pressable
+                        style={[styles.saveButton, isSaving && styles.savingButton]}
+                        onPress={handleListSave}
+                        disabled={isSaving}
+                    >
+                        <Text style={styles.buttonText}>
+                            {isSaving ? 'Saving...' : 'Save Meal'}
+                        </Text>
                     </Pressable>
                 </View>
             )}
@@ -247,5 +252,143 @@ const Search = () => {
     );
 };
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        marginTop: 48,
+    },
+    foodResultContainer: {
+        marginHorizontal: 24,
+        marginVertical: 8,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 16,
+        padding: 16,
+    },
+    foodResultContent: {
+        flexDirection: 'row',
+    },
+    foodInfoContainer: {
+        flex: 1,
+        paddingRight: 8,
+    },
+    foodName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        flexWrap: 'wrap',
+    },
+    brandName: {
+        fontSize: 18,
+        color: '#4B5563',
+    },
+    caloriesContainer: {
+        justifyContent: 'center',
+    },
+    calories: {
+        fontSize: 20,
+        fontWeight: 500,
+        textAlign: 'right',
+        color: '#4B5563',
+    },
+    servingSize: {
+        fontSize: 18,
+        fontWeight: 300,
+        textAlign: 'right',
+        color: '#4B5563',
+    },
+    pressedText: {
+        color: '#9CA3AF',
+    },
+    foodListContainer: {
+        backgroundColor: '#F3F4F6',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        maxHeight: 100,
+    },
+    foodListContent: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    foodBubble: {
+        backgroundColor: '#15803D',
+        borderRadius: 9999,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        margin: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    foodBubbleName: {
+        marginRight: 8,
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    foodBubbleCalories: {
+        marginRight: 8,
+        color: 'white',
+        fontSize: 16,
+    },
+    removeButton: {
+        color: '#B91C1C',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    searchInputContainer: {
+        paddingHorizontal: 16,
+        marginTop: 8,
+    },
+    searchInput: {
+        marginVertical: 4,
+        backgroundColor: '#E5E7EB',
+        borderRadius: 12,
+        padding: 8,
+        paddingHorizontal: 16,
+    },
+    suggestionsContainer: {
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 12,
+        marginHorizontal: 16,
+    },
+    suggestionItem: {
+        padding: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E7EB',
+    },
+    loadingFooter: {
+        paddingVertical: 16,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 16,
+        backgroundColor: 'white',
+    },
+    clearButton: {
+        backgroundColor: '#B91C1C',
+        padding: 8,
+        borderRadius: 4,
+        flex: 1,
+        marginRight: 8,
+    },
+    saveButton: {
+        backgroundColor: '#15803D',
+        padding: 8,
+        borderRadius: 4,
+        flex: 1,
+        marginLeft: 8,
+    },
+    savingButton: {
+        backgroundColor: '#9CA3AF',
+    },
+    buttonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 20,
+    },
+});
 
 export default Search;

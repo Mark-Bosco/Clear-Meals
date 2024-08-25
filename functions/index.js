@@ -20,7 +20,7 @@ async function getAccessToken(uid) {
   if (userDoc.exists) {
     const userData = userDoc.data();
     if (userData.fatSecretToken && userData.fatSecretTokenExpiry > Date.now()) {
-      console.log('Using cached token for user:', uid);
+      //console.log('Using cached token for user:', uid);
       return userData.fatSecretToken;
     }
   }
@@ -50,7 +50,7 @@ async function getAccessToken(uid) {
       fatSecretTokenExpiry: Date.now() + expiresIn * 1000 // Convert seconds to milliseconds
     }, { merge: true });
 
-    console.log('New token obtained and cached for user:', uid);
+    //console.log('New token obtained and cached for user:', uid);
     return accessToken;
   } catch (error) {
     console.error('Error getting access token:', error);
@@ -59,19 +59,19 @@ async function getAccessToken(uid) {
 }
 
 exports.getUserToken = functions.https.onCall(async (data, context) => {
-  console.log('getUserToken Function called');
+  //console.log('getUserToken Function called');
 
   if (!context.auth) {
-    console.log('No auth context found in the function');
+    //console.log('No auth context found in the function');
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
   const uid = context.auth.uid;
-  console.log('User authenticated in function:', uid);
+  //console.log('User authenticated in function:', uid);
 
   try {
     const accessToken = await getAccessToken(uid);
-    console.log('Access token obtained successfully');
+    //console.log('Access token obtained successfully');
     return { access_token: accessToken };
   } catch (error) {
     console.error('Error getting access token in function:', error);

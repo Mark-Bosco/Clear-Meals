@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { sendEmailVerification } from 'firebase/auth';
 import { router } from 'expo-router';
@@ -27,30 +27,86 @@ export default function VerifyEmail() {
   };
 
   return (
-    <View className="flex-1 pt-20 bg-white items-center justify-top p-4">
-      <Text className="text-5xl font-bold mb-4">Verify Your Email</Text>
-      <Text className="text-center mb-4">
+    <View style={styles.container}>
+      <Text style={styles.title}>Verify Your Email</Text>
+      <Text style={styles.description}>
         Please verify your email address. Check your inbox for a verification link. Sign in once your email is verified.
       </Text>
       {message && (
-        <View className={`${isError ? 'bg-red-700' : 'bg-yellow-600'} mb-2 p-2 rounded`}>
-          <Text className="text-white font-bold">
+        <View style={[styles.messageContainer, isError ? styles.errorContainer : styles.warningContainer]}>
+          <Text style={styles.messageText}>
             {message}
           </Text>
         </View>
       )}
       <Pressable
-        className="bg-green-700 py-2 px-4 rounded active:bg-green-800"
+        style={({ pressed }) => [styles.resendButton, pressed && styles.resendButtonPressed]}
         onPress={resendVerificationEmail}
       >
-        <Text className="text-white text-lg font-bold">Resend Verification Email</Text>
+        <Text style={styles.resendButtonText}>Resend Verification Email</Text>
       </Pressable>
       <Pressable
-        className="mt-4"
+        style={styles.signInButton}
         onPress={() => router.replace('/(auth)/signin')}
       >
-        <Text className="font-bold text-gray-600">Continue to Sign In</Text>
+        <Text style={styles.signInButtonText}>Continue to Sign In</Text>
       </Pressable>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 80,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    padding: 16,
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  description: {
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  messageContainer: {
+    marginBottom: 8,
+    padding: 8,
+    borderRadius: 4,
+  },
+  errorContainer: {
+    backgroundColor: '#B91C1C',
+  },
+  warningContainer: {
+    backgroundColor: '#CA8A04',
+  },
+  messageText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  resendButton: {
+    backgroundColor: '#15803D',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  resendButtonPressed: {
+    backgroundColor: '#166534',
+  },
+  resendButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  signInButton: {
+    marginTop: 16,
+  },
+  signInButtonText: {
+    fontWeight: 'bold',
+    color: '#4B5563',
+  },
+});

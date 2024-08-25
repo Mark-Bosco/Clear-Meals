@@ -1,11 +1,10 @@
-// history.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, SafeAreaView } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { fetchDailyLog } from '../../backend/firestore';
 import { useAuth } from '../../contexts/AuthContext';
-import { DailyLog } from '../types';
+import { DailyLog } from '../../types/types';
 
 interface MarkedDates {
   [date: string]: {
@@ -68,13 +67,33 @@ const History = () => {
   }, [loadMonthData]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Calendar
         onMonthChange={(month: MonthData) => loadMonthData(month)}
         onDayPress={handleDayPress}
         markedDates={markedDates}
+        theme={{
+          calendarBackground: 'white',
+          textSectionTitleColor: '#15803d',
+          selectedDayBackgroundColor: '#15803d',
+          selectedDayTextColor: '#ffffff',
+          todayTextColor: '#15803d',
+          dayTextColor: '#2d4150',
+          textDisabledColor: '#d9e1e8',
+          dotColor: '#15803d',
+          selectedDotColor: '#ffffff',
+          arrowColor: '#15803d',
+          monthTextColor: 'black',
+          textDayFontSize: 16,
+          textMonthFontSize: 18,
+          textDayHeaderFontSize: 14,
+          textDayFontWeight: '400',
+          textMonthFontWeight: 'bold',
+          textDayHeaderFontWeight: '400',
+        }}
+        style={styles.calendar}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -82,7 +101,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    paddingTop: 50,
+  },
+  calendar: {
+    height: '100%',
+    justifyContent: 'center'
   },
 });
 
