@@ -4,13 +4,13 @@ module.exports = {
   expo: {
     name: "Clear Meals",
     slug: "clear-meals",
-    version: "1.0.0",
+    version: "1.0.0-alpha",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/images/icon.png",
+      image: "./assets/images/icon-nobg.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -32,7 +32,7 @@ module.exports = {
         origin: false
       },
       eas: {
-        projectId: "fabb4ccd-42aa-4703-91e9-87c997c539fb"
+        projectId: "30dbfa73-4e23-457c-9bb6-b3b142212ab1"
       },
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
