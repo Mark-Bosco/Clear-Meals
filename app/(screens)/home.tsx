@@ -301,14 +301,13 @@ const styles = StyleSheet.create({
     right: 0,
   },
   mealMenuContent: {
-    backgroundColor: 'rgb(21, 128, 61)',
+    backgroundColor: '#15803d',
     padding: 8,
   },
   closeMealMenuButton: {
     alignItems: 'center',
-    backgroundColor: 'rgb(239, 68, 68)',
+    backgroundColor: '#bc2f2f',
     padding: 8,
-    marginBottom: 8,
     marginHorizontal: 8,
     borderRadius: 12,
   },
@@ -327,7 +326,7 @@ const styles = StyleSheet.create({
   },
   mealTypeButtonText: {
     fontSize: 32,
-    color: 'black',
+    color: '#083318',
     fontWeight: 'bold',
   },
   addFoodButton: {

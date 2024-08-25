@@ -9,21 +9,29 @@ export default function SignUp() {
   const [value, setValue] = React.useState({
     email: '',
     password: '',
+    confirmPassword: '',
     error: ''
   });
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const resetFields = () => {
     setValue({
       email: '',
       password: '',
+      confirmPassword: '',
       error: ''
     });
   };
 
   async function signUp() {
     setValue((currentValue) => {
-      if (!currentValue.email || !currentValue.password) {
-        return { ...currentValue, error: 'Please enter both email and password.' };
+      if (!currentValue.email || !currentValue.password || !currentValue.confirmPassword) {
+        return { ...currentValue, error: 'Please fill in all fields.' };
+      }
+
+      if (currentValue.password !== currentValue.confirmPassword) {
+        return { ...currentValue, error: 'Passwords do not match.' };
       }
 
       createUserWithEmailAndPassword(auth, currentValue.email, currentValue.password)
@@ -86,8 +94,33 @@ export default function SignUp() {
             placeholder="Password"
             value={value.password}
             onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, password: text }))}
-            secureTextEntry={true}
+            secureTextEntry={!showPassword}
           />
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={24}
+              color="gray"
+            />
+          </Pressable>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name="key-outline" size={24} color="gray" />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            value={value.confirmPassword}
+            onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, confirmPassword: text }))}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons
+              name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+              size={24}
+              color="gray"
+            />
+          </Pressable>
         </View>
 
         <Pressable
@@ -154,6 +187,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 8,
+    marginRight: 8,
   },
   signUpButton: {
     backgroundColor: '#15803D',

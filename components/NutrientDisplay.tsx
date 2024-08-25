@@ -49,7 +49,7 @@ const NutrientItem: React.FC<NutrientItemProps> = ({ label, value, type }) => (
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#15803D',
+    backgroundColor: '#15803d',
     borderRadius: 10,
     padding: 10,
   },
@@ -67,16 +67,16 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   valueContainer: {
-    backgroundColor: '#F5E6D3',
+    backgroundColor: '#e7f2eb',
     borderRadius: 10,
     paddingVertical: 2,
     paddingHorizontal: 8,
     marginTop: 2,
   },
   value: {
-    color: 'black',
+    color: '#020c06',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '400',
     textAlign: 'center',
   },
 });

@@ -12,7 +12,7 @@ const getCalories = (food: Food): string => {
 };
 
 const getServingSize = (food: Food): string => {
-    return food.servings.serving[0].serving_description.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '');
+    return food.servings.serving[0].serving_description.split(' ').slice(0, 2).join(' ');
 }
 
 const FoodResult = React.memo(({ food, onPress }: { food: Food; onPress: () => void }) => (
@@ -300,10 +300,10 @@ const styles = StyleSheet.create({
         color: '#9CA3AF',
     },
     foodListContainer: {
-        backgroundColor: '#F3F4F6',
+        backgroundColor: '#d0e5d8',
         paddingHorizontal: 16,
         paddingVertical: 8,
-        maxHeight: 100,
+        maxHeight: 125,
     },
     foodListContent: {
         flexDirection: 'row',
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     foodBubble: {
         backgroundColor: '#15803D',
         borderRadius: 9999,
-        paddingHorizontal: 12,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         margin: 4,
         flexDirection: 'row',
@@ -328,11 +328,16 @@ const styles = StyleSheet.create({
         marginRight: 8,
         color: 'white',
         fontSize: 16,
+        fontWeight: '300'
     },
     removeButton: {
-        color: '#B91C1C',
+        color: 'white',
         fontSize: 20,
         fontWeight: 'bold',
+        backgroundColor: '#B91C1C',
+        borderRadius: 8,
+        textAlign: 'center',
+        width: 20
     },
     searchInputContainer: {
         paddingHorizontal: 16,
@@ -340,10 +345,11 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         marginVertical: 4,
-        backgroundColor: '#E5E7EB',
+        backgroundColor: '#e7f2eb',
         borderRadius: 12,
         padding: 8,
         paddingHorizontal: 16,
+        fontSize: 18,
     },
     suggestionsContainer: {
         backgroundColor: 'white',
@@ -364,7 +370,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         padding: 16,
-        backgroundColor: 'white',
+        backgroundColor: '#d0e5d8',
     },
     clearButton: {
         backgroundColor: '#B91C1C',

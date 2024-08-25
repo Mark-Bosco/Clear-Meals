@@ -11,6 +11,7 @@ export default function SignIn() {
     password: '',
     error: ''
   });
+  const [showPassword, setShowPassword] = React.useState(false);
 
   // Reset state when component unmounts or user navigates away
   const resetFields = () => {
@@ -23,7 +24,6 @@ export default function SignIn() {
 
   async function signIn() {
     setValue((currentValue) => {
-
       if (!currentValue.email || !currentValue.password) {
         return { ...currentValue, error: 'Please enter both email and password.' };
       }
@@ -91,8 +91,15 @@ export default function SignIn() {
             placeholder="Password"
             value={value.password}
             onChangeText={(text) => setValue((prevValue) => ({ ...prevValue, password: text }))}
-            secureTextEntry={true}
+            secureTextEntry={!showPassword}
           />
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off-outline" : "eye-outline"}
+              size={24}
+              color="gray"
+            />
+          </Pressable>
         </View>
 
         <Pressable
@@ -170,6 +177,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 8,
+    marginRight: 8,
   },
   signInButton: {
     backgroundColor: '#15803D',

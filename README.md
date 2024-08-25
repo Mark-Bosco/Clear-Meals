@@ -27,7 +27,6 @@
 ### Home:
 
 ### Settings:
-- Requires user to sign in before deleting account
 
 ### History:
 
@@ -35,9 +34,6 @@
 - Make github presentable, add project to resume
 - Make shareable APK
 - Add name and icon
-- Update buttton responsiveness 
-   - Nutrition save button
-   - History and settings buttons
 
 ### Future:
 - Search screen for no results

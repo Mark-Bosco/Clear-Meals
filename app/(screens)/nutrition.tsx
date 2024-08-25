@@ -317,9 +317,20 @@ const Nutrition: React.FC = () => {
                         <Pressable
                             onPress={handleSave}
                             disabled={isEditing}
-                            style={[styles.saveButton, isEditing && styles.disabledSaveButton]}
+                            style={({ pressed }) => [
+                                styles.saveButton,
+                                isEditing && styles.disabledSaveButton,
+                                pressed && styles.pressedSaveButton
+                            ]}
                         >
-                            <Text style={styles.saveButtonText}>Save</Text>
+                            {({ pressed }) => (
+                                <Text style={[
+                                    styles.saveButtonText,
+                                    pressed && styles.pressedSaveButtonText
+                                ]}>
+                                    Save
+                                </Text>
+                            )}
                         </Pressable>
                     </View>
                 </View>
@@ -361,7 +372,7 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
     },
     resetButton: {
-        backgroundColor: '#6B7280',
+        backgroundColor: '#bc2f2f',
         borderRadius: 4,
         paddingHorizontal: 16,
         justifyContent: 'center',
@@ -419,7 +430,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         textAlign: 'center',
-        width: 70,
+        width: 65,
     },
     inputLabel: {
         fontSize: 20,
@@ -429,23 +440,30 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     saveButtonContainer: {
-        marginLeft: 8,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'white',
         borderRadius: 4,
+        overflow: 'hidden',
+    },
+    saveButton: {
+        backgroundColor: 'white',
         paddingHorizontal: 20,
         paddingVertical: 8,
     },
-    saveButton: {
-        opacity: 1,
-    },
     disabledSaveButton: {
-        opacity: 0.2,
+        backgroundColor: '#a7aaaf',
+        opacity: .75
+    },
+    pressedSaveButton: {
+        backgroundColor: '#D1D5DB',
     },
     saveButtonText: {
         fontSize: 24,
         fontWeight: 'bold',
+        color: '#0c4c24',
+    },
+    pressedSaveButtonText: {
+        color: '#166534',
     },
 });
 
