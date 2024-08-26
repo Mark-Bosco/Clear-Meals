@@ -12,6 +12,7 @@ npm-debug.*
 web-build/
 backend/config.js
 serviceAccountKey.json
+google-services.json
 
 # macOS
 .DS_Store
@@ -21,7 +22,5 @@ serviceAccountKey.json
 
 expo-env.d.ts
 # @end expo-cli
-
-google-services.json
 
 /android
