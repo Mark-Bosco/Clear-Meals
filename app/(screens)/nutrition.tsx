@@ -232,6 +232,11 @@ const Nutrition: React.FC = () => {
                 try {
                     await saveFood(user.uid, date, mealType, foodListItem, foodIndex || '-1');
                 } catch (error) {
+                    console.log(mealType);
+                    console.log(user.uid);
+                    console.log(date);
+                    console.log(foodListItem);
+                    console.log(foodIndex);
                     console.error('Error updating food item in the meal:', error);
                 }
 
@@ -435,7 +440,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         textAlign: 'center',
-        width: 65,
+        width: 75,
     },
     inputLabel: {
         fontSize: 20,

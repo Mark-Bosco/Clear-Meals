@@ -12,14 +12,15 @@ module.exports = {
     splash: {
       image: "./assets/images/icon-nobg.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      backgroundColor: "#439963"
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.bosco.clearmeals",
+      package: "com.bosco.mealtracker",
+      googleServicesFile: "./google-services.json"
     },
     plugins: [
       "expo-router",
@@ -40,7 +41,6 @@ module.exports = {
       firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
-      proxyIp: process.env.PROXY_IP,
       clientSecret: process.env.CLIENT_SECRET,
       clientId: process.env.CLIENT_ID,
     }

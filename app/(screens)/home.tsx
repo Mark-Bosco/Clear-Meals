@@ -177,7 +177,7 @@ const Home = () => {
                     <Pressable
                       onPress={() => router.push({
                         pathname: '/(screens)/nutrition',
-                        params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType, foodIndex: index, dateString: date }
+                        params: { foodId: food.food_id, calorieOverride: food.calories, mealType: mealType, foodIndex: index, dateString: dailyLog.date }
                       })}
                       style={({ pressed }) => [
                         styles.foodItem,

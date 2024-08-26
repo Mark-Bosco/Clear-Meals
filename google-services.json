@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "150250495715",
+    "project_id": "meal-tracker-e698c",
+    "storage_bucket": "meal-tracker-e698c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150250495715:android:ae0809031e1be2ec4e2fd6",
+        "android_client_info": {
+          "package_name": "com.bosco.mealtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150250495715-6diognt4p3pgvjs8tavng9nbms3cstpi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bosco.mealtracker",
+            "certificate_hash": "2a693bf744b315dd03ea95c4f5d49f4606ea2784"
+          }
+        },
+        {
+          "client_id": "150250495715-cn75n2a88l1r379f6jmb216bs4ndlcl3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsU3cAwQ5MzXNK_-s-YUuRop6ECT0L-30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150250495715-cn75n2a88l1r379f6jmb216bs4ndlcl3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

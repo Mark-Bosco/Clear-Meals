@@ -21,3 +21,5 @@ serviceAccountKey.json
 
 expo-env.d.ts
 # @end expo-cli
+
+/android
