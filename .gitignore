@@ -8,9 +8,9 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
-.env
 web-build/
-backend/config.js
+# Had to comment these out to make a successful build
+.env
 serviceAccountKey.json
 google-services.json
 
