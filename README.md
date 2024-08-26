@@ -33,6 +33,8 @@
 ### Misc:
 
 ### Future:
+- Fix app icon cropping
+- Fix build needing gitignored files using eas secret:create
 - Search screen for no results
 - Empty daily log message
 - Add gestures
