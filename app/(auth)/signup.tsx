@@ -59,6 +59,7 @@ export default function SignUp() {
               break;
             default:
               setValue((prevValue) => ({ ...prevValue, error: 'An error occurred during sign up. Please try again.' }));
+              console.error(error);
           }
         });
 
