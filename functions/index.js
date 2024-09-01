@@ -58,23 +58,23 @@ async function getAccessToken(uid) {
   }
 }
 
-exports.getUserToken = functions
-  .runWith({
-    vpcConnector: 'cm-connector',
-    vpcConnectorEgressSettings: 'ALL_TRAFFIC'
-  })
-  .https.onCall(async (data, context) => {
-    if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
-    }
+exports.getUserToken = functions.https.onCall(async (data, context) => {
+  //console.log('getUserToken Function called');
 
-    const uid = context.auth.uid;
+  if (!context.auth) {
+    //console.log('No auth context found in the function');
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
 
-    try {
-      const accessToken = await getAccessToken(uid);
-      return { access_token: accessToken };
-    } catch (error) {
-      console.error('Error getting access token in function:', error);
-      throw new functions.https.HttpsError('internal', 'Error getting access token', error);
-    }
-  });
+  const uid = context.auth.uid;
+  //console.log('User authenticated in function:', uid);
+
+  try {
+    const accessToken = await getAccessToken(uid);
+    //console.log('Access token obtained successfully');
+    return { access_token: accessToken };
+  } catch (error) {
+    console.error('Error getting access token in function:', error);
+    throw new functions.https.HttpsError('internal', 'Error getting access token', error);
+  }
+});
