@@ -1,8 +1,13 @@
-# Clear Meals
+<p align="center">
+  <img src="./assets/images/icon-nobg.png" alt="Clear Meals Logo" width="400" height="400">
+</p>
 
-<img src="./assets/images/icon-nobg.png" alt="Clear Meals Logo" width="300" height="300">
+<p align="center">
+  <em>Track with ease, savor simplicity</em>
+</p>
 
-## 📱 A Comprehensive Mobile Meal Tracking Application
+
+# Clear Meals: A Comprehensive Mobile Meal Tracking Application
 
 Clear Meals is a robust, user-friendly mobile application designed to help users track their daily food intake, monitor nutritional information, and maintain a healthy lifestyle. Built with React Native and Expo, this app offers a seamless experience for logging meals, searching for foods, and analyzing nutritional data.
 
@@ -44,27 +49,7 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
 8. **Calendar View**: Access the calendar icon to view your meal history.
 9. **Settings**: Manage your account settings and log out.
 
-## 🚀 For Developers
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/your-username/clear-meals.git
-   ```
-2. Install dependencies:
-   ```
-   cd clear-meals
-   npm install
-   ```
-3. Set up environment variables:
-   - Create a `.env` file in the root directory.
-   - Add the necessary Firebase and FatSecret API credentials.
-4. Start the Expo development server:
-   ```
-   npm start
-   ```
-5. Use the Expo Go app on your mobile device or an emulator to run the application.
-
-## 📚 API Documentation
+## 📚 API Information
 
 The app uses the FatSecret API for food data. Key endpoints include:
 - `foods.search`: Search for food items.
