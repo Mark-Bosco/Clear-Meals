@@ -35,7 +35,7 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
 
 ## 📲 How to Use (Currently Android Only)
 
-1. **Download**: Install the latest APK from [Releases](https://github.com/your-username/clear-meals/releases) on your Android device.
+1. **Download**: Install the latest APK from [here](https://github.com/Mark-Bosco/Clear-Meals/releases/tag/v0.1.0-alpha) onto your Android device.
 2. **Sign Up/Sign In**: Create an account or sign in to an existing one.
 3. **Email Verification**: Verify your email address to access all features.
 4. **Home Screen**: View your daily food log and total calorie intake.
@@ -45,8 +45,8 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
    - Select a food item to view nutritional information.
    - Adjust serving size if needed and tap "Save" to add to your meal.
 6. **View Nutritional Details**: Tap on any logged food item to see detailed nutritional information.
-7. **Edit/Delete Foods**: Swipe left on a food item in your daily log to delete it.
-8. **Calendar View**: Access the calendar icon to view your meal history.
+7. **Edit/Delete Foods**: Swipe left on a food item in your daily log to delete it. Click on an item to edit it.
+8. **Calendar View**: Access the calendar icon to view your meal history and edit any daily logs.
 9. **Settings**: Manage your account settings and log out.
 
 ## 📚 API Information
