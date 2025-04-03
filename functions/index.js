@@ -78,3 +78,7 @@ exports.getUserToken = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', 'Error getting access token', error);
   }
 });
+
+// Delete artifacts here
+// https://console.cloud.google.com/artifacts/docker/meal-tracker-e698c/us-central1/gcf-artifacts
+// https://console.cloud.google.com/artifacts?project=meal-tracker-e698c
